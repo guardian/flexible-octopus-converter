@@ -1,8 +1,8 @@
-name := "flexible-octopus-converter"
+name := "octopus-converter"
 
 organization := "com.gu"
 
-description:= "CHANGE_ME"
+description:= "AWS Lambda providing conversion between Octopus JSON and Thrift"
 
 version := "1.0"
 
@@ -28,4 +28,11 @@ assemblyJarName := s"${name.value}.jar"
 riffRaffPackageType := assembly.value
 riffRaffUploadArtifactBucket := Option("riffraff-artifact")
 riffRaffUploadManifestBucket := Option("riffraff-builds")
-riffRaffArtifactResources += (file("cfn.yaml"), s"${name.value}-cfn/cfn.yaml")
+riffRaffManifestProjectName := "Editorial Tools::Octopus Conversion Lambda"
+
+import sbtassembly.Log4j2MergeStrategy
+
+assemblyMergeStrategy in assembly := {
+  case PathList(ps@_*) if ps.last == "Log4j2Plugins.dat" => Log4j2MergeStrategy.plugincache
+  case x => MergeStrategy.defaultMergeStrategy(x)
+}

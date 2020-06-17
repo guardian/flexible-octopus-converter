@@ -1,13 +1,17 @@
-package com.gu.octopus-thrift
+package com.gu.octopusthrift
 
 import com.amazonaws.services.lambda.runtime.Context
-import org.slf4j.{Logger, LoggerFactory}
+import org.apache.logging.log4j.{ LogManager, Logger }
+
+trait Logging {
+  protected val logger: Logger = LogManager.getLogger(getClass)
+}
 
 /**
-  * This is compatible with aws' lambda JSON to POJO conversion.
-  * You can test your lambda by sending it the following payload:
-  * {"name": "Bob"}
-  */
+ * This is compatible with aws' lambda JSON to POJO conversion.
+ * You can test your lambda by sending it the following payload:
+ * {"name": "Bob"}
+ */
 class LambdaInput() {
   var name: String = _
   def getName(): String = name
@@ -22,13 +26,10 @@ object Env {
   def apply(): Env = Env(
     Option(System.getenv("App")).getOrElse("DEV"),
     Option(System.getenv("Stack")).getOrElse("DEV"),
-    Option(System.getenv("Stage")).getOrElse("DEV")
-  )
+    Option(System.getenv("Stage")).getOrElse("DEV"))
 }
 
-object Lambda {
-
-  val logger: Logger = LoggerFactory.getLogger(this.getClass)
+object Lambda extends Logging {
 
   /*
    * This is your lambda entry point
