@@ -1,0 +1,11 @@
+stacks: [flexible]
+regions: [eu-west-1]
+
+deployments:
+  flexible-octopus-converter:
+    type: aws-lambda
+    parameters:
+      bucket: composer-dist
+      functionNames: [octopus-conversion-]
+      fileName: flexible-octopus-converter.jar
+      prefixStack: false
