@@ -32,12 +32,12 @@ object Lambda extends Logging {
   /*
    * This is your lambda entry point
    */
-  def handler(lambdaInput: String, context: Context): Unit = {
+  def handler(lambdaInput: JsValue, context: Context): Unit = {
     val env = Env()
     logger.info(s"Starting $env")
-    logger.info(process(lambdaInput))
+    logger.info(s"Received: \n $lambdaInput")
     val stream = new Kinesis()
-    stream.publish(Json.parse(lambdaInput))
+    stream.publish(lambdaInput)
   }
 
   /*
