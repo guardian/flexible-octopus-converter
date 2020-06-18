@@ -18,7 +18,7 @@ scalacOptions ++= Seq(
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.1",
   "com.amazonaws" % "aws-lambda-java-log4j2" % "1.1.0",
-  "com.amazonaws" % "aws-java-sdk-kinesis" % "1.11.302",
+  "com.amazonaws" % "aws-java-sdk-kinesis" % "1.11.804",
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.8.2",
   "org.slf4j" % "slf4j-api" % "1.7.30"
 )
@@ -36,9 +36,7 @@ riffRaffUploadArtifactBucket := Option("riffraff-artifact")
 riffRaffUploadManifestBucket := Option("riffraff-builds")
 riffRaffManifestProjectName := "Editorial Tools::Octopus Conversion Lambda"
 
-import sbtassembly.Log4j2MergeStrategy
-
 assemblyMergeStrategy in assembly := {
-  case PathList(ps@_*) if ps.last == "Log4j2Plugins.dat" => Log4j2MergeStrategy.plugincache
-  case x => MergeStrategy.defaultMergeStrategy(x)
+      case PathList("META-INF", xs@_*) => MergeStrategy.discard
+      case _ => MergeStrategy.first
 }
