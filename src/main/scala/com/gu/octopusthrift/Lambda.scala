@@ -1,11 +1,9 @@
 package com.gu.octopusthrift
 
 import com.amazonaws.services.lambda.runtime.Context
-import org.apache.logging.log4j.{ LogManager, Logger }
-
-trait Logging {
-  protected val logger: Logger = LogManager.getLogger(getClass)
-}
+import play.api.libs.json._
+import com.gu.octopusthrift.aws.Kinesis
+import com.gu.octopusthrift.services.Logging
 
 /**
  * This is compatible with aws' lambda JSON to POJO conversion.
@@ -34,20 +32,22 @@ object Lambda extends Logging {
   /*
    * This is your lambda entry point
    */
-  def handler(lambdaInput: LambdaInput, context: Context): Unit = {
+  def handler(lambdaInput: String, context: Context): Unit = {
     val env = Env()
     logger.info(s"Starting $env")
-    logger.info(process(lambdaInput.name, env))
+    logger.info(process(lambdaInput))
+    val stream = new Kinesis()
+    stream.publish(Json.parse(lambdaInput))
   }
 
   /*
    * I recommend to put your logic outside of the handler
    */
-  def process(name: String, env: Env): String = s"Hello $name! (from ${env.app} in ${env.stack})\n"
+  def process(json: String): JsValue = Json.parse(json)
 }
 
 object TestIt {
   def main(args: Array[String]): Unit = {
-    println(Lambda.process(args.headOption.getOrElse("Alex"), Env()))
+    println(Lambda.process(args.headOption.getOrElse("Alex")))
   }
 }

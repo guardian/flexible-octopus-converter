@@ -6,7 +6,7 @@ description:= "AWS Lambda providing conversion between Octopus JSON and Thrift"
 
 version := "1.0"
 
-scalaVersion := "2.12.8"
+scalaVersion := "2.13.1"
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -18,9 +18,15 @@ scalacOptions ++= Seq(
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.1",
   "com.amazonaws" % "aws-lambda-java-log4j2" % "1.1.0",
+  "com.amazonaws" % "aws-java-sdk-kinesis" % "1.11.302",
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.8.2",
   "org.slf4j" % "slf4j-api" % "1.7.30"
 )
+
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.1.2"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.2" % "test"
+
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.8.1" 
 
 enablePlugins(RiffRaffArtifact)
 
