@@ -1,7 +1,7 @@
 package com.gu.octopusthrift.services
 
-import org.apache.logging.log4j.{ LogManager, Logger }
+import org.slf4j.{ Logger, LoggerFactory }
 
 trait Logging {
-  protected val logger: Logger = LogManager.getLogger(getClass)
+  val logger: Logger = LoggerFactory.getLogger(this.getClass)
 }

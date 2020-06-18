@@ -19,8 +19,8 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.1",
   "com.amazonaws" % "aws-lambda-java-log4j2" % "1.1.0",
   "com.amazonaws" % "aws-java-sdk-kinesis" % "1.11.804",
-  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.8.2",
-  "org.slf4j" % "slf4j-api" % "1.7.30"
+  "com.amazonaws" % "aws-lambda-java-events" % "1.3.0",
+  "org.slf4j" % "slf4j-simple" % "1.7.25"
 )
 
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.1.2"

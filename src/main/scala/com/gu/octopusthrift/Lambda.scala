@@ -4,17 +4,10 @@ import com.amazonaws.services.lambda.runtime.Context
 import play.api.libs.json._
 import com.gu.octopusthrift.aws.Kinesis
 import com.gu.octopusthrift.services.Logging
-
-/**
- * This is compatible with aws' lambda JSON to POJO conversion.
- * You can test your lambda by sending it the following payload:
- * {"name": "Bob"}
- */
-class LambdaInput() {
-  var name: String = _
-  def getName(): String = name
-  def setName(theName: String): Unit = name = theName
-}
+import java.io.InputStream
+import com.amazonaws.services.lambda.runtime.events.KinesisEvent
+import com.amazonaws.services.kinesis.model.Record
+import scala.collection.JavaConverters._
 
 case class Env(app: String, stack: String, stage: String) {
   override def toString: String = s"App: $app, Stack: $stack, Stage: $stage\n"
@@ -28,16 +21,22 @@ object Env {
 }
 
 object Lambda extends Logging {
-
   /*
    * This is your lambda entry point
    */
-  def handler(lambdaInput: JsValue, context: Context): Unit = {
+  def handler(lambdaInput: KinesisEvent, context: Context): Unit = {
+
+    val records: List[Record] = lambdaInput.getRecords.asScala.map(_.getKinesis).toList
     val env = Env()
-    logger.info(s"Starting $env")
-    logger.info(s"Received: \n $lambdaInput")
     val stream = new Kinesis()
-    stream.publish(lambdaInput)
+    records.map(record => stream.publish(Json.parse(record.getData().array())))
+
+    // try {
+    //   stream.publish(Json.parse(lambdaInput))
+    // } catch {
+    //   case e: Exception =>
+    //     logger.info("Couldn't parse Json")
+    // }
   }
 
   /*
@@ -46,8 +45,3 @@ object Lambda extends Logging {
   def process(json: String): JsValue = Json.parse(json)
 }
 
-object TestIt {
-  def main(args: Array[String]): Unit = {
-    println(Lambda.process(args.headOption.getOrElse("Alex")))
-  }
-}
