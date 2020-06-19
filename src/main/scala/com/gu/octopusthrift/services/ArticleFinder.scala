@@ -3,35 +3,35 @@ package com.gu.octopusthrift.services
 import play.api.libs.json._
 
 object ArticleFinder {
-  def findBodyText(json: JsValue): JsObject = {
-    val articles = getArticles(json)
-    val bodyText = getBodyText(articles)
-    bodyText
+
+  def findBodyText(json: JsValue): Option[JsObject] = {
+    getArticles(json).flatMap(_.find(hasBodyTextForWebPublication))
   }
 
-  private val bodyTextObjectTypes = Seq("Body Text", "Tabular Text", "Panel Text")
-  private val forWebCodes = Seq("w", "W", "b", "B")
+  private val bodyTextObjectTypes =
+    Seq("Body Text", "Tabular Text", "Panel Text")
+  private val forWebCodes = Seq("w", "b")
 
-  private def getArticles(json: JsValue): Seq[JsObject] = {
-    (json \ "articles").get.as[Seq[JsObject]]
+  private def getArticles(json: JsValue): Option[Seq[JsObject]] = {
+    Some((json \ "articles").get.as[Seq[JsObject]])
   }
 
-  private def getBodyText(articles: Seq[JsObject]): JsObject = {
+  private def extractJsonString(article: JsObject, property: String) = {
+    (article \ property).get.as[JsString].value
+  }
 
-    var bodyTextArticles = Seq[JsObject]()
+  private def hasBodyTextForWebPublication(article: JsObject): Boolean = {
+    val objectType = (article \ "object_type")
+    val forPublicationValue = (article \ "for_publication")
 
-    for (article <- articles) {
-      val objectType = (article \ "objectType").get.as[JsString].value.split('[')(0)
-      val forPublicationValue = (article \ "for_publication").get.as[JsString]
-
-      if (bodyTextObjectTypes.contains(objectType) && forWebCodes.contains(forPublicationValue))
-        bodyTextArticles = bodyTextArticles :+ article
+    (objectType.isDefined, forPublicationValue.isDefined) match {
+      case (true, true) => {
+        val objectType = extractJsonString(article, "object_type").split('[')(0).trim()
+        val forPublicationValue = extractJsonString(article, "for_publication").toLowerCase().trim()
+        bodyTextObjectTypes.contains(objectType) && forWebCodes.contains(forPublicationValue)
+      }
+      case _ => false
     }
-
-    if (bodyTextArticles.length != 1)
-      throw new Exception("Too many body text articles found")
-
-    bodyTextArticles(0)
   }
 
 }
