@@ -29,9 +29,13 @@ class ArticleFinderSpec extends AnyWordSpec with Matchers {
         val exampleJson = readJson(s"/exampleWithNoWebPublication.json")
         assert(ArticleFinder.findBodyText(exampleJson) == None)
       }
-      // TODO: Clarify what we should do if there is more than one possible body text in the article
-      "retrieve the primary body text when there is more than one possible body text" ignore {
-        ???
+      "retrieve the primary body text when there is more than one possible body text" in {
+        val articleWithMultipleBodyTexts = readJson(s"/exampleWithMultipleBodyTexts.json")
+        val articleWithBodyPanelAndTabularTexts = readJson(s"/exampleWithMultipleBodyPanelAndTabular.json")
+        val expectedArticle = readJson(s"/article.json")
+
+        assert(ArticleFinder.findBodyText(articleWithMultipleBodyTexts) == Some(expectedArticle))
+        assert(ArticleFinder.findBodyText(articleWithBodyPanelAndTabularTexts) == Some(expectedArticle))
       }
     }
   }

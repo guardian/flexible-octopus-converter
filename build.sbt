@@ -30,6 +30,9 @@ libraryDependencies += "com.typesafe.play" %% "play-json" % "2.8.1"
 
 libraryDependencies += "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor" % "2.11.0"
 
+resolvers += Resolver.bintrayRepo("guardian", "editorial-tools")
+libraryDependencies += "com.gu" %% "flexible-octopus-model" % "0.1.0"
+
 enablePlugins(RiffRaffArtifact)
 
 assemblyJarName := s"${name.value}.jar"
