@@ -2,20 +2,29 @@ package com.gu.octopusthrift.services
 
 import play.api.libs.json._
 import com.gu.octopusthrift.models.OctopusArticle
+import com.gu.octopusthrift.services.Logging
 
-object ArticleFinder {
+object ArticleFinder extends Logging {
 
   def findBodyText(json: JsValue): Option[OctopusArticle] = {
-    val bodyTexts = getArticles(json).filter(article => hasBodyTextForWebPublication(article))
-    getPriorityBodyText(bodyTexts)
+    val bodyTexts = getArticles(json).map(_.filter(article => hasBodyTextForWebPublication(article)))
+    bodyTexts.flatMap(getPriorityBodyText)
   }
 
   private val bodyTextObjectTypes =
     Seq("Body Text", "Tabular Text", "Panel Text")
   private val forWebCodes = Seq("w", "b")
 
-  private def getArticles(json: JsValue): Seq[OctopusArticle] = {
-    (json \ "articles").as[Seq[OctopusArticle]]
+  private def getArticles(json: JsValue): Option[Seq[OctopusArticle]] = {
+    val octopusArticles = (json \ "articles").validate[Seq[OctopusArticle]]
+    octopusArticles match {
+      case JsSuccess(articles, _) => Some(articles)
+      case e: JsError => {
+        logger.info(s"Unable to find articles, ${JsError.toJson(e)}")
+        None
+      }
+    }
+
   }
 
   private def hasBodyTextForWebPublication(article: OctopusArticle): Boolean = {

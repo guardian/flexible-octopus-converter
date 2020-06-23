@@ -4,17 +4,26 @@ import play.api.libs.json._
 import scala.util.{ Try, Success }
 import com.gu.octopusthrift.services.ArticleFinder
 import com.gu.octopusthrift.services.Logging
+import com.gu.octopusthrift.models.OctopusBundleCache
 
 object PayloadValidator extends Logging {
 
-  def isValidPayload(data: Array[Byte]): Boolean = {
-    Try(Json.parse(data)) match {
-      case Success(json) => {
-        //check composer ID and body text is present
-        hasComposerId(json) && ArticleFinder.findBodyText(json).isDefined
-      }
-      case _ => false
+  def validatePayload(decodedData: Array[Byte]): Option[JsValue] = {
+    Try(Json.parse(decodedData)) match {
+      case Success(payload) => Some(payload)
+      case _ => None
     }
+  }
+
+  def getBundleOrBundleCache(json: JsValue): Either[JsValue, OctopusBundleCache] = {
+    (json).validate[OctopusBundleCache] match {
+      case JsSuccess(bundleCache, _) => Right(bundleCache)
+      case _: JsError => Left(json)
+    }
+  }
+
+  def isValidBundle(json: JsValue): Boolean = {
+    hasComposerId(json) && ArticleFinder.findBodyText(json).isDefined
   }
 
   private def hasComposerId(json: JsValue): Boolean = {

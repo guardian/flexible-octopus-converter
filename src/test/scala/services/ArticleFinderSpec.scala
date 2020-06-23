@@ -21,6 +21,10 @@ class ArticleFinderSpec extends AnyWordSpec with Matchers {
         val exampleJson = TestUtils.readJson(s"/exampleWithoutBodyText.json")
         assert(ArticleFinder.findBodyText(exampleJson) == None)
       }
+      "return None when there is not a complete article" in {
+        val exampleJson = TestUtils.readJson(s"/exampleWithMissingArticleFields.json")
+        assert(ArticleFinder.findBodyText(exampleJson) == None)
+      }
       "return None when there is a body text, but it isn't for web" in {
         val exampleJson = TestUtils.readJson(s"/exampleWithNoWebPublication.json")
         assert(ArticleFinder.findBodyText(exampleJson) == None)
