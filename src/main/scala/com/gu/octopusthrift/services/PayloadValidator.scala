@@ -4,7 +4,7 @@ import play.api.libs.json._
 import scala.util.{ Try, Success }
 import com.gu.octopusthrift.services.ArticleFinder
 import com.gu.octopusthrift.services.Logging
-import com.gu.octopusthrift.models.OctopusBundleCache
+import com.gu.octopusthrift.models._
 
 object PayloadValidator extends Logging {
 
@@ -15,28 +15,14 @@ object PayloadValidator extends Logging {
     }
   }
 
-  def getBundleOrBundleCache(json: JsValue): Either[JsValue, OctopusBundleCache] = {
+  def getBundleOrBundleCache(json: JsValue): Either[OctopusBundle, OctopusBundleCache] = {
     (json).validate[OctopusBundleCache] match {
       case JsSuccess(bundleCache, _) => Right(bundleCache)
-      case _: JsError => Left(json)
+      case _: JsError => Left(json.as[OctopusBundle])
     }
   }
 
-  def isValidBundle(json: JsValue): Boolean = {
-    hasComposerId(json) && ArticleFinder.findBodyText(json).isDefined
+  def isValidBundle(bundle: OctopusBundle): Boolean = {
+    bundle.composerId.length > 0 && ArticleFinder.findBodyText(bundle).isDefined
   }
-
-  private def hasComposerId(json: JsValue): Boolean = {
-    // the info8 value contains 10 comma-separated values, where the Composer ID is at index 7
-    val composerIdLocation = 7
-
-    Try((json \ "info8").get.as[JsString].value.split(',')(composerIdLocation)) match {
-      case Success(composerId) => composerId.trim.length > 0
-      case _ => {
-        logger.info("composer ID not found")
-        false
-      }
-    }
-  }
-
 }

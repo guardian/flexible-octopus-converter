@@ -27,7 +27,9 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.1.2" % "test",
   "com.typesafe.play" %% "play-json" % "2.8.1",
   "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor" % "2.11.0",
-  "com.gu" %% "flexible-octopus-model" % "0.1.0"
+  "com.gu" %% "flexible-octopus-model" % "0.2.0",
+  "org.apache.thrift" % "libthrift" % "0.13.0",
+  "com.twitter" %% "scrooge-core" % "20.5.0"
 )
 
 enablePlugins(RiffRaffArtifact)
