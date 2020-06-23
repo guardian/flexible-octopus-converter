@@ -8,7 +8,9 @@ import com.amazonaws.services.kinesis.{ AmazonKinesis, AmazonKinesisClientBuilde
 import com.gu.octopusthrift.services.Logging
 import play.api.libs.json._
 
-class Kinesis() extends Logging {
+import com.gu.octopusthrift.Config
+
+class Kinesis(config: Config) extends Logging {
 
   private val builder = AmazonKinesisClientBuilder.defaultClient()
 
@@ -22,7 +24,7 @@ class Kinesis() extends Logging {
     val data = ByteBuffer.wrap(Json.toBytes(message))
 
     val request = new PutRecordRequest()
-      .withStreamName(System.getenv("thriftStream"))
+      .withStreamName(config.thriftStreamName)
       .withPartitionKey(partitionKey)
       .withData(data)
 

@@ -1,51 +1,35 @@
 package com.gu.octopusthrift.services
 
 import play.api.libs.json._
+import com.gu.octopusthrift.models.OctopusArticle
 
 object ArticleFinder {
 
-  def findBodyText(json: JsValue): Option[JsObject] = {
-    val bodyTexts: Option[Seq[JsObject]] = getArticles(json).map(_.filter(hasBodyTextForWebPublication))
-    bodyTexts.flatMap(getPriorityBodyText)
+  def findBodyText(json: JsValue): Option[OctopusArticle] = {
+    val bodyTexts = getArticles(json).filter(article => hasBodyTextForWebPublication(article))
+    getPriorityBodyText(bodyTexts)
   }
 
   private val bodyTextObjectTypes =
     Seq("Body Text", "Tabular Text", "Panel Text")
   private val forWebCodes = Seq("w", "b")
 
-  private def getArticles(json: JsValue): Option[Seq[JsObject]] = {
-    Some((json \ "articles").get.as[Seq[JsObject]])
+  private def getArticles(json: JsValue): Seq[OctopusArticle] = {
+    (json \ "articles").as[Seq[OctopusArticle]]
   }
 
-  private def extractJsonString(article: JsObject, property: String) = {
-    (article \ property).get.as[JsString].value
+  private def hasBodyTextForWebPublication(article: OctopusArticle): Boolean = {
+    bodyTextObjectTypes.contains(article.objectType) && forWebCodes.contains(
+      article.forPublication.toLowerCase()) && article.objectNumber == 1 // we want the first of any given object type
   }
 
-  private def extractJsonNumber(article: JsObject, property: String) = {
-    (article \ property).get.as[JsNumber].value
-  }
+  // Where we have more than one type of body text object, the 'Body Text' takes precedence
+  private def getPriorityBodyText(bodyTexts: Seq[OctopusArticle]): Option[OctopusArticle] = {
+    val bodyText = bodyTexts.find(_.objectType == "Body Text")
 
-  private def hasBodyTextForWebPublication(article: JsObject): Boolean = {
-    val objectType = (article \ "object_type")
-    val forPublicationValue = (article \ "for_publication")
-
-    (objectType.isDefined, forPublicationValue.isDefined) match {
-      case (true, true) => {
-        val objectType = extractJsonString(article, "object_type").split('[')(0).trim()
-        val objectNumber = extractJsonNumber(article, "object_number")
-        val forPublicationValue = extractJsonString(article, "for_publication").toLowerCase().trim()
-        bodyTextObjectTypes.contains(objectType) && forWebCodes.contains(forPublicationValue) && objectNumber == 1
-      }
-      case _ => false
-    }
-  }
-
-  private def getPriorityBodyText(bodyTexts: Seq[JsObject]): Option[JsObject] = {
-    val bodyText = bodyTexts.find(bt => extractJsonString(bt, "object_type") == "Body Text")
-
-    (bodyText, bodyTexts.isEmpty) match {
-      case (Some(value), _) => bodyText
-      case (None, false) => Some(bodyTexts.head)
+    bodyText match {
+      case Some(_) => bodyText
+      case _ if !bodyTexts.isEmpty => Some(bodyTexts.head)
       case _ => None
     }
 

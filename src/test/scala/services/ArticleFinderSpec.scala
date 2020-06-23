@@ -5,6 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import play.api.libs.json.Json
 
 import com.gu.octopusthrift.services.ArticleFinder
+import com.gu.octopusthrift.models.OctopusArticle
 import scala.TestUtils
 
 class ArticleFinderSpec extends AnyWordSpec with Matchers {
@@ -13,7 +14,7 @@ class ArticleFinderSpec extends AnyWordSpec with Matchers {
     "findBodyText is called" should {
       "retrieve the body text when it's present" in {
         val exampleJson = TestUtils.readJson(s"/example.json")
-        val expectedArticle = TestUtils.readJson(s"/article.json")
+        val expectedArticle = TestUtils.readJson(s"/article.json").as[OctopusArticle]
         assert(ArticleFinder.findBodyText(exampleJson) == Some(expectedArticle))
       }
       "return None when there's no body text found" in {
@@ -26,8 +27,9 @@ class ArticleFinderSpec extends AnyWordSpec with Matchers {
       }
       "retrieve the primary body text when there is more than one possible body text" in {
         val articleWithMultipleBodyTexts = TestUtils.readJson(s"/exampleWithMultipleBodyTexts.json")
-        val articleWithBodyPanelAndTabularTexts = TestUtils.readJson(s"/exampleWithMultipleBodyPanelAndTabular.json")
-        val expectedArticle = TestUtils.readJson(s"/article.json")
+        val articleWithBodyPanelAndTabularTexts =
+          TestUtils.readJson(s"/exampleWithMultipleBodyPanelAndTabular.json")
+        val expectedArticle = TestUtils.readJson(s"/article.json").as[OctopusArticle]
 
         assert(ArticleFinder.findBodyText(articleWithMultipleBodyTexts) == Some(expectedArticle))
         assert(ArticleFinder.findBodyText(articleWithBodyPanelAndTabularTexts) == Some(expectedArticle))

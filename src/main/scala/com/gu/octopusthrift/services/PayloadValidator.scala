@@ -18,7 +18,10 @@ object PayloadValidator extends Logging {
   }
 
   private def hasComposerId(json: JsValue): Boolean = {
-    Try((json \ "info8").get.as[JsString].value.split(',')(7)) match {
+    // the info8 value contains 10 comma-separated values, where the Composer ID is at index 7
+    val composerIdLocation = 7
+
+    Try((json \ "info8").get.as[JsString].value.split(',')(composerIdLocation)) match {
       case Success(composerId) => composerId.trim.length > 0
       case _ => {
         logger.info("composer ID not found")

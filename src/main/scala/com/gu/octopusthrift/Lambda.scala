@@ -4,13 +4,13 @@ import com.amazonaws.services.lambda.runtime.Context
 import play.api.libs.json._
 import com.gu.octopusthrift.aws.Kinesis
 import com.gu.octopusthrift.services.Logging
+import com.gu.octopusthrift.Config
 import java.io.InputStream
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.kinesis.model.Record
 import scala.jdk.CollectionConverters._
 import com.gu.octopusthrift.services._
 import java.nio.ByteBuffer
-
 object Lambda extends Logging {
 
   def handler(lambdaInput: KinesisEvent, context: Context): Unit = {
@@ -29,7 +29,7 @@ object Lambda extends Logging {
       // TODO: dead letter queue
     } else {
       val json: JsValue = Json.parse(data)
-      val stream = new Kinesis()
+      val stream = new Kinesis(Config.apply)
       stream.publish(json)
     }
   }
