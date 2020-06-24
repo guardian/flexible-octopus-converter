@@ -13,7 +13,6 @@ import com.gu.octopusthrift.services.PayloadValidator.{
   isValidBundle,
   validatePayload
 }
-import java.util.Base64
 import scala.jdk.CollectionConverters._
 import com.gu.flexibleoctopus.model.thrift._
 import com.gu.octopusthrift.util.ThriftSerializer.{ serializeToBytes }
@@ -26,7 +25,7 @@ object Lambda extends Logging {
 
     records.map(record => {
       val data = record.getData().array()
-      val validatedPayload = validatePayload(Base64.getDecoder().decode(data))
+      val validatedPayload = validatePayload(data)
       val bundleOrBundleCache = validatedPayload.map(getBundleOrBundleCache)
       val sequenceNumber = record.getSequenceNumber
 
@@ -53,8 +52,7 @@ object Lambda extends Logging {
         case Success(bundle) => {
           logger.info(s"Bundle passed validation, sequence number: $sequenceNumber")
           val serializedThriftBundle = serializeToBytes(bundle)
-          val encodedData = Base64.getEncoder().encode(serializedThriftBundle)
-          stream.publish(encodedData)
+          stream.publish(serializedThriftBundle)
         }
         case _ => {
           logger.info(s"Bundle failed validation as StoryBundle, sequence number: $sequenceNumber")
