@@ -17,10 +17,13 @@ scalacOptions ++= Seq(
 )
 resolvers += Resolver.bintrayRepo("guardian", "editorial-tools")
 
+val awsSdkVersion = "1.11.804"
+
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.1",
   "com.amazonaws" % "aws-lambda-java-log4j2" % "1.1.0",
-  "com.amazonaws" % "aws-java-sdk-kinesis" % "1.11.804",
+  "com.amazonaws" % "aws-java-sdk-kinesis" % awsSdkVersion,
+  "com.amazonaws" % "aws-java-sdk-sqs" % awsSdkVersion,
   "com.amazonaws" % "aws-lambda-java-events" % "1.3.0",
   "org.slf4j" % "slf4j-simple" % "1.7.25",
   "org.scalactic" %% "scalactic" % "3.1.2",

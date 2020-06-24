@@ -25,10 +25,12 @@ case class OctopusArticle(
   status: String,
   attachedTo: Option[Int],
   onPages: Option[String]) {
-  def lastModifiedEpoch = TimeUnit.MILLISECONDS.toSeconds(DateTime
-    .parse(lastModified, DateTimeFormat.forPattern("yyyyMMddHHmm").withZoneUTC())
-    .withZone(DateTimeZone.UTC)
-    .getMillis)
+  def lastModifiedEpoch =
+    TimeUnit.MILLISECONDS.toSeconds(
+      DateTime
+        .parse(lastModified, DateTimeFormat.forPattern("yyyyMMddHHmm").withZoneUTC())
+        .withZone(DateTimeZone.UTC)
+        .getMillis)
   def pageNumber = onPages.map(_.split(',')(0).split(';')(0).toLong)
   def as[T](implicit f: OctopusArticle => T) = f(this)
 }
@@ -47,6 +49,19 @@ object OctopusArticle {
     (__ \ "status").read[String] and
     (__ \ "attached_to").readNullable[Int] and
     (__ \ "on_pages").readNullable[String])(OctopusArticle.apply _)
+
+  implicit val writes = ((__ \ "id").write[Int] and
+    (__ \ "filename").write[String] and
+    (__ \ "for_publication").write[String] and
+    (__ \ "lawyered").write[String] and
+    (__ \ "object_type").write[String] and
+    (__ \ "object_number").write[Int] and
+    (__ \ "last_modified").write[String] and
+    (__ \ "in_use_by").writeNullable[String] and
+    (__ \ "ischeckedout").write[String] and
+    (__ \ "status").write[String] and
+    (__ \ "attached_to").writeNullable[Int] and
+    (__ \ "on_pages").writeNullable[String])(unlift(OctopusArticle.unapply))
 
   implicit def articleMapper = (octopusArticle: OctopusArticle) => {
 

@@ -4,16 +4,20 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.kinesis.model.Record
 import play.api.libs.json._
-import com.gu.octopusthrift.aws.Kinesis
+import com.gu.octopusthrift.aws.{ Kinesis, SQS }
 import com.gu.octopusthrift.services.Logging
 import com.gu.octopusthrift.Config
 import com.gu.octopusthrift.models._
-import com.gu.octopusthrift.services._
-import com.gu.octopusthrift.services.PayloadValidator.{ getBundleOrBundleCache, isValidBundle, validatePayload }
-import java.nio.ByteBuffer
+import com.gu.octopusthrift.services.PayloadValidator.{
+  getBundleOrBundleCache,
+  isValidBundle,
+  validatePayload
+}
 import java.util.Base64
 import scala.jdk.CollectionConverters._
-import scala.util.{ Success, Try }
+import com.gu.flexibleoctopus.model.thrift._
+import com.gu.octopusthrift.util.ThriftSerializer.{ serializeToBytes }
+import scala.util.{ Try, Success }
 
 object Lambda extends Logging {
 
@@ -24,25 +28,41 @@ object Lambda extends Logging {
       val data = record.getData().array()
       val validatedPayload = validatePayload(Base64.getDecoder().decode(data))
       val bundleOrBundleCache = validatedPayload.map(getBundleOrBundleCache)
+      val sequenceNumber = record.getSequenceNumber
 
       bundleOrBundleCache map {
-        case Left(singleBundle: OctopusBundle) => processBundle(singleBundle, record.getSequenceNumber)
+        case Left(bundle: OctopusBundle) => {
+          logger.info(s"Processing single story bundle, sequence number: $sequenceNumber")
+          processBundle(bundle, sequenceNumber)
+        }
         case Right(bundleCache: OctopusBundleCache) => {
-          logger.info("Processing daily snapshot of all live story bundles in Octopus database")
-          bundleCache.bundles.map(bundle => processBundle(bundle, record.getSequenceNumber))
+          logger.info(
+            s"Processing daily snapshot of all live story bundles in Octopus database, sequence number: $sequenceNumber")
+          bundleCache.bundles.map(bundle => processBundle(bundle, sequenceNumber))
         }
       }
     })
   }
 
-  private def processBundle(bundle: OctopusBundle, sequenceNumber: String): Unit = {
-    if (isValidBundle(bundle)) {
-      // TODO: parse to thrift model, base64 encode, push to stream
-      val stream = new Kinesis(Config.apply)
-      // stream.publish(json)
+  private def processBundle(octopusBundle: OctopusBundle, sequenceNumber: String): Unit = {
+    val stream = new Kinesis(Config.apply)
+    val deadLetterQueue = new SQS(Config.apply)
+
+    if (isValidBundle(octopusBundle)) {
+      Try(octopusBundle.as[StoryBundle]) match {
+        case Success(bundle) => {
+          logger.info(s"Bundle passed validation, sequence number: $sequenceNumber")
+          val serializedThriftBundle = serializeToBytes(bundle)
+          val encodedData = Base64.getEncoder().encode(serializedThriftBundle)
+          stream.publish(encodedData)
+        }
+        case _ => {
+          logger.info(s"Bundle failed validation as StoryBundle, sequence number: $sequenceNumber")
+          deadLetterQueue.sendMessage(Json.toJson(octopusBundle))
+        }
+      }
     } else {
-      logger.info(s"JSON paylod is invalid, sequence number: $sequenceNumber")
-      // TODO: dead letter queue
+      logger.info(s"Bundle failed validation, sequence number: $sequenceNumber")
     }
   }
 

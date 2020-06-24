@@ -16,12 +16,12 @@ class Kinesis(config: Config) extends Logging {
 
   private lazy val kinesisClient: AmazonKinesis = builder
 
-  def publish(message: JsValue): Unit = {
+  def publish(message: Array[Byte]): Unit = {
     val partitionKey = UUID.randomUUID().toString
 
     logger.info("Publishing message to kinesis")
 
-    val data = ByteBuffer.wrap(Json.toBytes(message))
+    val data = ByteBuffer.wrap(message)
 
     val request = new PutRecordRequest()
       .withStreamName(config.thriftStreamName)

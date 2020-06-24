@@ -23,10 +23,13 @@ case class OctopusBundle(
   articles: Array[OctopusArticle]) {
   private val composerIdLocation = 7
   def composerId: String = info8.split(',')(composerIdLocation).trim
-  def pubDateEpochDays = pubDate.map(date => TimeUnit.MILLISECONDS.toDays(DateTime
-    .parse(date, DateTimeFormat.forPattern("yyyyMMdd").withZoneUTC())
-    .withZone(DateTimeZone.UTC)
-    .getMillis))
+  def pubDateEpochDays =
+    pubDate.map(date =>
+      TimeUnit.MILLISECONDS.toDays(
+        DateTime
+          .parse(date, DateTimeFormat.forPattern("yyyyMMdd").withZoneUTC())
+          .withZone(DateTimeZone.UTC)
+          .getMillis))
   def as[T](implicit f: OctopusBundle => T) = f(this)
 }
 
@@ -37,6 +40,13 @@ object OctopusBundle {
     (__ \ "pubdate").readNullable[String] and
     (__ \ "sectioncode").read[String] and
     (__ \ "articles").read[Array[OctopusArticle]])(OctopusBundle.apply _)
+
+  implicit val writes: Writes[OctopusBundle] = ((JsPath \ "id").write[Int] and
+    (JsPath \ "info8").write[String] and
+    (JsPath \ "pubCode").write[String] and
+    (JsPath \ "pubDate").writeNullable[String] and
+    (JsPath \ "sectionCode").write[String] and
+    (JsPath \ "articles").write[Array[OctopusArticle]])(unlift(OctopusBundle.unapply))
 
   implicit def bundleMapper = (octopusBundle: OctopusBundle) => {
 
