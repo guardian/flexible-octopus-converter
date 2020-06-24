@@ -21,7 +21,7 @@ case class OctopusArticle(
   inUseBy: Option[String],
   isCheckedOut: String,
   status: String,
-  attachedTo: Option[String],
+  attachedTo: Option[Int],
   onPages: Option[String]) {
   def lastModifiedEpoch = DateTime.parse(lastModified, DateTimeFormat.forPattern("yyyyMMddHHmm")).getMillis
   def pageNumber = onPages.map(_.split(',')(0).split(';')(0).toLong)
@@ -40,7 +40,7 @@ object OctopusArticle {
     (__ \ "in_use_by").readNullable[String] and
     (__ \ "ischeckedout").read[String] and
     (__ \ "status").read[String] and
-    (__ \ "attached_to").readNullable[String] and
+    (__ \ "attached_to").readNullable[Int] and
     (__ \ "on_pages").readNullable[String])(OctopusArticle.apply _)
 
   implicit def articleMapper = (octopusArticle: OctopusArticle) => {

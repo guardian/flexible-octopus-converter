@@ -48,6 +48,6 @@ object OctopusBundle {
       headline,
       bodyText.flatMap(_.pageNumber),
       octopusBundle.pubDateEpochDays,
-      bodyText.flatMap(_.attachedTo))
+      bodyText.flatMap(_.attachedTo.map(_.toString)))
   }
 }
