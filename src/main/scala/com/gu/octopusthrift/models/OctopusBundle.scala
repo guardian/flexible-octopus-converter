@@ -1,11 +1,13 @@
 package com.gu.octopusthrift.models
 
+import java.util.concurrent.TimeUnit
+
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import com.gu.octopusthrift.models.OctopusArticle
 import com.gu.flexibleoctopus.model.thrift._
 import com.gu.octopusthrift.services.ArticleFinder
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, DateTimeZone }
 import org.joda.time.format.DateTimeFormat
 
 /**
@@ -21,7 +23,10 @@ case class OctopusBundle(
   articles: Array[OctopusArticle]) {
   private val composerIdLocation = 7
   def composerId: String = info8.split(',')(composerIdLocation).trim
-  def pubDateEpochDays = pubDate.map(date => DateTime.parse(date, DateTimeFormat.forPattern("yyyyMMdd")).getMillis)
+  def pubDateEpochDays = pubDate.map(date => TimeUnit.MILLISECONDS.toDays(DateTime
+    .parse(date, DateTimeFormat.forPattern("yyyyMMdd").withZoneUTC())
+    .withZone(DateTimeZone.UTC)
+    .getMillis))
   def as[T](implicit f: OctopusBundle => T) = f(this)
 }
 

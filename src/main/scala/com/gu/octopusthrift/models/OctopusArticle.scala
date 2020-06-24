@@ -1,9 +1,11 @@
 package com.gu.octopusthrift.models
 
+import java.util.concurrent.TimeUnit
+
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import com.gu.flexibleoctopus.model.thrift._
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, DateTimeZone }
 import org.joda.time.format.DateTimeFormat
 
 /**
@@ -23,7 +25,10 @@ case class OctopusArticle(
   status: String,
   attachedTo: Option[Int],
   onPages: Option[String]) {
-  def lastModifiedEpoch = DateTime.parse(lastModified, DateTimeFormat.forPattern("yyyyMMddHHmm")).getMillis
+  def lastModifiedEpoch = TimeUnit.MILLISECONDS.toSeconds(DateTime
+    .parse(lastModified, DateTimeFormat.forPattern("yyyyMMddHHmm").withZoneUTC())
+    .withZone(DateTimeZone.UTC)
+    .getMillis)
   def pageNumber = onPages.map(_.split(',')(0).split(';')(0).toLong)
   def as[T](implicit f: OctopusArticle => T) = f(this)
 }
