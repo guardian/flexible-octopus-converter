@@ -26,6 +26,7 @@ object Lambda extends Logging {
     records.map(record => {
       val data = record.getData().array()
       val validatedPayload = validatePayload(data)
+      validatedPayload.map(json => logger.info(s"validated json: ${json}"))
       val bundleOrBundleCache = validatedPayload.map(getBundleOrBundleCache)
       val sequenceNumber = record.getSequenceNumber
 
