@@ -2,11 +2,9 @@ package scala.services
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
-import play.api.libs.json.Json
 
 import com.gu.octopusthrift.services.ArticleFinder
 import com.gu.octopusthrift.models._
-import scala.TestUtils
 
 class ArticleFinderSpec extends AnyWordSpec with Matchers {
 

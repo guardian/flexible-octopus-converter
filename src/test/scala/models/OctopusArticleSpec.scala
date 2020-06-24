@@ -1,16 +1,12 @@
 package scala.models
 
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.matchers.should.Matchers
-import play.api.libs.json.Json
-import scala.io.Source
 
 import com.gu.octopusthrift.models.OctopusArticle
 import com.gu.flexibleoctopus.model.thrift._
-import scala.TestUtils
 
-object ArticleHelpers {
-  def setupOctopusArticleWithPage(onPages: Option[String]) = OctopusArticle(
+object ArticleTestHelpers {
+  def createOctopusArticleWithPage(onPages: Option[String]) = OctopusArticle(
     1234,
     "article.t0",
     "w",
