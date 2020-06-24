@@ -3,13 +3,14 @@ package scala.models
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import play.api.libs.json.Json
-import scala.io.Source
 
-import com.gu.octopusthrift.models.OctopusArticle
+import scala.io.Source
+import com.gu.octopusthrift.models.{ OctopusArticle, OctopusBundle }
 import com.gu.flexibleoctopus.model.thrift._
+
 import scala.TestUtils
 
-object ArticleHelpers {
+object BundleHelpers {
   def setupOctopusArticleWithPage(onPages: Option[String]) = OctopusArticle(
     1234,
     "article.t0",
@@ -25,9 +26,9 @@ object ArticleHelpers {
     onPages)
 }
 
-class OctopusArticleSpec extends AnyWordSpec {
-  "OctopusArticle" when {
-    "as[Article] is called" should {
+class OctopusBundleSpec extends AnyWordSpec {
+  "OctopusBundle" when {
+    "as[StoryBundle] is called" should {
       "map the values correctly" in {
         val octopusArticle = OctopusArticle(
           1234,
@@ -43,13 +44,21 @@ class OctopusArticleSpec extends AnyWordSpec {
           Some(1000),
           Some("1"))
 
-        val thriftArticle = octopusArticle.as[Article]
+        val octopusBundle = OctopusBundle(
+          2345,
+          ",,,,,,,1",
+          "",
+          Some("20200624"),
+          "",
+          Array(octopusArticle))
 
-        assert(thriftArticle.forPublication == ForPublication.Web)
-        assert(thriftArticle.isCheckedOut == false)
-        assert(thriftArticle.lastModified == 1593000000)
-        assert(thriftArticle.lawyered == Lawyered.Notapplicable)
-        assert(thriftArticle.status == ArticleStatus.Writers)
+        val thriftBundle = octopusBundle.as[StoryBundle]
+
+        assert(thriftBundle.bodyText.id == 1234)
+        assert(thriftBundle.composerId == "1")
+        assert(thriftBundle.pageNumber == Some(1))
+        assert(thriftBundle.printPublicationDate == Some(18437))
+        assert(thriftBundle.octopusLayoutId == Some("1000"))
       }
     }
   }
