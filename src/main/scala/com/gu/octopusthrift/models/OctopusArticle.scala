@@ -7,6 +7,7 @@ import play.api.libs.functional.syntax._
 import com.gu.flexibleoctopus.model.thrift._
 import org.joda.time.{ DateTime, DateTimeZone }
 import org.joda.time.format.DateTimeFormat
+import scala.util.{ Try, Success }
 
 /**
  * This model does not represent all fields sent by Octopus,
@@ -25,13 +26,21 @@ case class OctopusArticle(
   status: String,
   attachedTo: Option[Int],
   onPages: Option[String]) {
+
   def lastModifiedEpoch =
     TimeUnit.MILLISECONDS.toSeconds(
       DateTime
         .parse(lastModified, DateTimeFormat.forPattern("yyyyMMddHHmm").withZoneUTC())
         .withZone(DateTimeZone.UTC)
         .getMillis)
-  def pageNumber = onPages.map(_.split(',')(0).split(';')(0).toLong)
+
+  def pageNumber: Option[Long] = {
+    Try(onPages.map(_.split(',')(0).split(';')(0).toLong)) match {
+      case Success(number) => number
+      case _ => None
+    }
+  }
+
   def as[T](implicit f: OctopusArticle => T) = f(this)
 }
 

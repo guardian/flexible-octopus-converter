@@ -95,6 +95,20 @@ class OctopusBundleSpec extends AnyWordSpec with Matchers {
 
         thriftBundle.pageNumber shouldBe Some(10)
       }
+      "return None when page string is empty" in {
+        val article = ArticleTestHelpers.createOctopusArticleWithPage(Some(""))
+        val bundle = BundleTestHelpers.createOctopusBundleWithArticle(article)
+        val thriftBundle = bundle.as[StoryBundle]
+
+        thriftBundle.pageNumber shouldBe None
+      }
+      "return None when page string is a non-long" in {
+        val article = ArticleTestHelpers.createOctopusArticleWithPage(Some("one"))
+        val bundle = BundleTestHelpers.createOctopusBundleWithArticle(article)
+        val thriftBundle = bundle.as[StoryBundle]
+
+        thriftBundle.pageNumber shouldBe None
+      }
     }
   }
 }
