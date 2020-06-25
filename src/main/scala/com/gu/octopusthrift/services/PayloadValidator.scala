@@ -20,6 +20,10 @@ object PayloadValidator extends Logging {
   }
 
   def isValidBundle(bundle: OctopusBundle): Boolean = {
+    logger.info(s"Validating bundle: $bundle")
+    logger.info(s"Composer ID: ${bundle.composerId}")
+    bundle.articles.map(article => logger.info(s"Article: $article"))
+    logger.info(s"Body text: ${ArticleFinder.findBodyText(bundle)}")
     bundle.composerId.length > 0 && ArticleFinder.findBodyText(bundle).isDefined
   }
 }
