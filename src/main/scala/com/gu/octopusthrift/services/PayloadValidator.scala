@@ -8,17 +8,14 @@ import com.gu.octopusthrift.models._
 
 object PayloadValidator extends Logging {
 
-  def validatePayload(decodedData: Array[Byte]): Option[JsValue] = {
+  def validatePayload(decodedData: Array[Byte]): Option[OctopusPayload] = {
     Try(Json.parse(decodedData)) match {
-      case Success(payload) => Some(payload)
+      case Success(json) =>
+        (json).validate[OctopusPayload] match {
+          case JsSuccess(payload, _) => Some(payload)
+          case _: JsError => None
+        }
       case _ => None
-    }
-  }
-
-  def getBundleOrBundleCache(json: JsValue): Either[OctopusBundle, OctopusBundleCache] = {
-    (json).validate[OctopusBundleCache] match {
-      case JsSuccess(bundleCache, _) => Right(bundleCache)
-      case _: JsError => Left(json.as[OctopusBundle])
     }
   }
 

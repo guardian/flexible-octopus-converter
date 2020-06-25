@@ -8,11 +8,7 @@ import com.gu.octopusthrift.aws.{ Kinesis, SQS }
 import com.gu.octopusthrift.services.Logging
 import com.gu.octopusthrift.Config
 import com.gu.octopusthrift.models._
-import com.gu.octopusthrift.services.PayloadValidator.{
-  getBundleOrBundleCache,
-  isValidBundle,
-  validatePayload
-}
+import com.gu.octopusthrift.services.PayloadValidator.{ isValidBundle, validatePayload }
 import scala.jdk.CollectionConverters._
 import com.gu.flexibleoctopus.model.thrift._
 import com.gu.octopusthrift.util.ThriftSerializer.{ serializeToBytes }
@@ -20,33 +16,34 @@ import scala.util.{ Try, Success }
 
 object Lambda extends Logging {
 
+  val deadLetterQueue = new SQS(Config.apply)
+
   def handler(lambdaInput: KinesisEvent, context: Context): Unit = {
     val records: List[Record] = lambdaInput.getRecords.asScala.map(_.getKinesis).toList
 
     records.map(record => {
       val data = record.getData().array()
-      val validatedPayload = validatePayload(data)
-      validatedPayload.map(json => logger.info(s"validated json: ${json}"))
-      val bundleOrBundleCache = validatedPayload.map(getBundleOrBundleCache)
+      val validatedPayload: Option[OctopusPayload] = validatePayload(data)
       val sequenceNumber = record.getSequenceNumber
 
-      bundleOrBundleCache map {
-        case Left(bundle: OctopusBundle) => {
+      validatedPayload.map(payload => {
+        if (payload.bundles.isDefined) {
+          logger.info(s"Processing daily snapshot, sequence number: $sequenceNumber")
+          payload.bundles.get.map(bundle => processBundle(bundle, sequenceNumber))
+        } else if (payload.data.isDefined) {
           logger.info(s"Processing single story bundle, sequence number: $sequenceNumber")
-          processBundle(bundle, sequenceNumber)
+          processBundle(payload.data.get, sequenceNumber)
+        } else {
+          logger.info(s"Payload does not contain expected data, sequence number: $sequenceNumber")
+          deadLetterQueue.sendMessage(Json.toJson(payload))
         }
-        case Right(bundleCache: OctopusBundleCache) => {
-          logger.info(
-            s"Processing daily snapshot of all live story bundles in Octopus database, sequence number: $sequenceNumber")
-          bundleCache.bundles.map(bundle => processBundle(bundle, sequenceNumber))
-        }
-      }
+      })
+
     })
   }
 
   private def processBundle(octopusBundle: OctopusBundle, sequenceNumber: String): Unit = {
     val stream = new Kinesis(Config.apply)
-    val deadLetterQueue = new SQS(Config.apply)
 
     if (isValidBundle(octopusBundle)) {
       Try(octopusBundle.as[StoryBundle]) match {

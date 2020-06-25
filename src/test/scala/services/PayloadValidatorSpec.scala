@@ -6,7 +6,6 @@ import play.api.libs.json.Json
 import scala.io.Source
 
 import com.gu.octopusthrift.services.PayloadValidator
-import com.gu.octopusthrift.models.OctopusBundleCache
 import com.gu.octopusthrift.models.OctopusBundle
 import java.nio.ByteBuffer
 import scala.TestUtils
@@ -36,18 +35,5 @@ class PayloadValidatorSpec extends AnyWordSpec with Matchers {
         PayloadValidator.isValidBundle(exampleJson) shouldBe true
       }
     }
-    "getBundleOrBundleCache" should {
-      "return a single bundle when only one bundle is present" in {
-        val exampleJson = TestUtils.readJson(s"/example.json")
-        val actual = PayloadValidator.getBundleOrBundleCache(exampleJson)
-        actual.isLeft shouldBe true
-      }
-      "return a bundle cache when there are multiple bundles present" in {
-        val exampleJson = TestUtils.readJson(s"/exampleBundleCache.json")
-        val actual = PayloadValidator.getBundleOrBundleCache(exampleJson)
-        actual.isRight shouldBe true
-      }
-    }
-
   }
 }

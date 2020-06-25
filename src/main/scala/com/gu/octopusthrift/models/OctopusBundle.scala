@@ -41,12 +41,12 @@ object OctopusBundle {
     (__ \ "sectioncode").read[String] and
     (__ \ "articles").read[Array[OctopusArticle]])(OctopusBundle.apply _)
 
-  implicit val writes: Writes[OctopusBundle] = ((JsPath \ "id").write[Int] and
-    (JsPath \ "info8").write[String] and
-    (JsPath \ "pubCode").write[String] and
-    (JsPath \ "pubDate").writeNullable[String] and
-    (JsPath \ "sectionCode").write[String] and
-    (JsPath \ "articles").write[Array[OctopusArticle]])(unlift(OctopusBundle.unapply))
+  implicit val writes: Writes[OctopusBundle] = ((__ \ "id").write[Int] and
+    (__ \ "info8").write[String] and
+    (__ \ "pubCode").write[String] and
+    (__ \ "pubDate").writeNullable[String] and
+    (__ \ "sectionCode").write[String] and
+    (__ \ "articles").write[Array[OctopusArticle]])(unlift(OctopusBundle.unapply))
 
   implicit def bundleMapper = (octopusBundle: OctopusBundle) => {
 
