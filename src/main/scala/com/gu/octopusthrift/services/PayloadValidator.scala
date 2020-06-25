@@ -24,6 +24,8 @@ object PayloadValidator extends Logging {
     logger.info(s"Composer ID: ${bundle.composerId}")
     bundle.articles.map(article => logger.info(s"Article: $article"))
     logger.info(s"Body text: ${ArticleFinder.findBodyText(bundle)}")
-    bundle.composerId.length > 0 && ArticleFinder.findBodyText(bundle).isDefined
+    bundle.composerId.map(id => id.length > 0).getOrElse(false) && ArticleFinder
+      .findBodyText(bundle)
+      .isDefined
   }
 }

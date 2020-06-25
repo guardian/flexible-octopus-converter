@@ -22,7 +22,14 @@ case class OctopusBundle(
   sectionCode: String,
   articles: Array[OctopusArticle]) {
   private val composerIdLocation = 7
-  def composerId: String = info8.split(',')(composerIdLocation).trim
+
+  def composerId: Option[String] = {
+    val i8 = info8.split(',')
+    i8.length > 7 match {
+      case true => Some(i8(composerIdLocation).trim)
+      case false => None
+    }
+  }
   def pubDateEpochDays =
     pubDate.map(date =>
       TimeUnit.MILLISECONDS.toDays(
@@ -56,7 +63,7 @@ object OctopusBundle {
 
     StoryBundle(
       octopusBundle.id,
-      octopusBundle.composerId,
+      octopusBundle.composerId.getOrElse(""),
       octopusBundle.pubCode,
       octopusBundle.sectionCode,
       article,

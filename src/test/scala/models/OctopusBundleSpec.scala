@@ -7,13 +7,8 @@ import com.gu.octopusthrift.models.{ OctopusArticle, OctopusBundle }
 import com.gu.flexibleoctopus.model.thrift._
 
 object BundleTestHelpers {
-  def createOctopusBundleWithArticle(article: OctopusArticle) = OctopusBundle(
-    2345,
-    ",,,,,,,1",
-    "",
-    Some("20200624"),
-    "",
-    Array(article))
+  def createOctopusBundleWithArticle(article: OctopusArticle) =
+    OctopusBundle(2345, ",,,,,,,1", "", Some("20200624"), "", Array(article))
 }
 
 class OctopusBundleSpec extends AnyWordSpec with Matchers {
@@ -34,13 +29,7 @@ class OctopusBundleSpec extends AnyWordSpec with Matchers {
           Some(1000),
           Some("1"))
 
-        val octopusBundle = OctopusBundle(
-          2345,
-          ",,,,,,,1",
-          "",
-          Some("20200624"),
-          "",
-          Array(octopusArticle))
+        val octopusBundle = OctopusBundle(2345, ",,,,,,,1", "", Some("20200624"), "", Array(octopusArticle))
 
         val thriftBundle = octopusBundle.as[StoryBundle]
 
@@ -49,6 +38,27 @@ class OctopusBundleSpec extends AnyWordSpec with Matchers {
         assert(thriftBundle.pageNumber == Some(1))
         assert(thriftBundle.printPublicationDate == Some(18437))
         assert(thriftBundle.octopusLayoutId == Some("1000"))
+      }
+      "handle no info8 data" in {
+        val octopusArticle = OctopusArticle(
+          1234,
+          "article.t0",
+          "w",
+          "n",
+          "Body Text",
+          1,
+          "202006241200",
+          None,
+          "N",
+          "Writers",
+          Some(1000),
+          Some("1"))
+
+        val octopusBundle = OctopusBundle(2345, "", "", Some("20200624"), "", Array(octopusArticle))
+
+        val thriftBundle = octopusBundle.as[StoryBundle]
+
+        assert(thriftBundle.composerId == "")
       }
       "return pageNumber None when not present" in {
         val article = ArticleTestHelpers.createOctopusArticleWithPage(None)
