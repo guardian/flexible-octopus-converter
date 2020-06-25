@@ -74,25 +74,25 @@ object OctopusArticle {
       "r" -> Lawyered.Priority)
 
     val articleStatus = Map(
-      "Chief Sub" -> ArticleStatus.Chiefsub,
-      "Desk" -> ArticleStatus.Desk,
-      "Finalled" -> ArticleStatus.Finalled,
-      "Hold" -> ArticleStatus.Hold,
-      "Killed" -> ArticleStatus.Killed,
-      "Revise Sub" -> ArticleStatus.Revisesub,
-      "Subs" -> ArticleStatus.Subs,
-      "Writers" -> ArticleStatus.Writers)
+      "chief sub" -> ArticleStatus.Chiefsub,
+      "desk" -> ArticleStatus.Desk,
+      "finalled" -> ArticleStatus.Finalled,
+      "hold" -> ArticleStatus.Hold,
+      "killed" -> ArticleStatus.Killed,
+      "revise sub" -> ArticleStatus.Revisesub,
+      "subs" -> ArticleStatus.Subs,
+      "writers" -> ArticleStatus.Writers)
 
-    val isCheckedOut = Map("Y" -> true, "N" -> false)
+    val isCheckedOut = Map("y" -> true, "n" -> false)
 
     Article(
       octopusArticle.id,
-      forPub(octopusArticle.forPublication),
+      forPub(octopusArticle.forPublication.toLowerCase),
       octopusArticle.inUseBy,
-      isCheckedOut(octopusArticle.isCheckedOut),
+      isCheckedOut(octopusArticle.isCheckedOut.toLowerCase),
       octopusArticle.lastModifiedEpoch,
-      lawyered(octopusArticle.lawyered),
-      articleStatus(octopusArticle.status),
+      lawyered(octopusArticle.lawyered.toLowerCase),
+      articleStatus(octopusArticle.status.toLowerCase),
       octopusArticle.filename)
   }
 }
