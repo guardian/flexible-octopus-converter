@@ -2,12 +2,13 @@ package com.gu.octopusthrift.models
 
 import java.util.concurrent.TimeUnit
 
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
 import com.gu.flexibleoctopus.model.thrift._
-import org.joda.time.{ DateTime, DateTimeZone }
 import org.joda.time.format.DateTimeFormat
-import scala.util.{ Try, Success }
+import org.joda.time.{ DateTime, DateTimeZone }
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
+
+import scala.util.{ Success, Try }
 
 /**
  * This model does not represent all fields sent by Octopus,
@@ -27,7 +28,7 @@ case class OctopusArticle(
   attachedTo: Option[Int],
   onPages: Option[String]) {
 
-  def lastModifiedEpoch =
+  def lastModifiedEpoch: Long =
     TimeUnit.MILLISECONDS.toSeconds(
       DateTime
         .parse(lastModified, DateTimeFormat.forPattern("yyyyMMddHHmm").withZoneUTC())
@@ -41,12 +42,12 @@ case class OctopusArticle(
     }
   }
 
-  def as[T](implicit f: OctopusArticle => T) = f(this)
+  def as[T](implicit f: OctopusArticle => T): T = f(this)
 }
 
 object OctopusArticle {
 
-  implicit val reads = ((__ \ "id").read[Int] and
+  implicit val reads: Reads[OctopusArticle] = ((__ \ "id").read[Int] and
     (__ \ "filename").read[String] and
     (__ \ "for_publication").read[String] and
     (__ \ "lawyered").read[String] and
@@ -59,7 +60,7 @@ object OctopusArticle {
     (__ \ "attached_to").readNullable[Int] and
     (__ \ "on_pages").readNullable[String])(OctopusArticle.apply _)
 
-  implicit val writes = ((__ \ "id").write[Int] and
+  implicit val writes: Writes[OctopusArticle] = ((__ \ "id").write[Int] and
     (__ \ "filename").write[String] and
     (__ \ "for_publication").write[String] and
     (__ \ "lawyered").write[String] and
@@ -72,7 +73,7 @@ object OctopusArticle {
     (__ \ "attached_to").writeNullable[Int] and
     (__ \ "on_pages").writeNullable[String])(unlift(OctopusArticle.unapply))
 
-  implicit def articleMapper = (octopusArticle: OctopusArticle) => {
+  implicit def articleMapper: OctopusArticle => Article = (octopusArticle: OctopusArticle) => {
 
     val forPub = Map("w" -> ForPublication.Web, "b" -> ForPublication.Both)
 

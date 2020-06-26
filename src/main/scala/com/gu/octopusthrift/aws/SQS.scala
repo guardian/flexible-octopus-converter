@@ -1,10 +1,12 @@
 package com.gu.octopusthrift.aws
 
-import com.amazonaws.services.sqs.model.{ SendMessageRequest }
+import com.amazonaws.services.sqs.model.{ SendMessageRequest, SendMessageResult }
 import com.amazonaws.services.sqs.{ AmazonSQS, AmazonSQSClientBuilder }
-import com.gu.octopusthrift.services.Logging
 import com.gu.octopusthrift.Config
+import com.gu.octopusthrift.services.Logging
 import play.api.libs.json._
+
+import scala.util.{ Failure, Success, Try }
 
 class SQS(config: Config) extends Logging {
 
@@ -17,14 +19,11 @@ class SQS(config: Config) extends Logging {
     val request =
       new SendMessageRequest().withQueueUrl(config.deadLetterQueue).withMessageBody(Json.stringify(message))
 
-    try {
-      logger.info(s"Message sent to dead letter queue")
-      sqsClient.sendMessage(request)
-    } catch {
-      case e: Exception =>
-        logger.info(s"Dead letter sendMessage Exception: ${e.getMessage}")
+    Try(sqsClient.sendMessage(request)) match {
+      case Success(messageResult: SendMessageResult) =>
+        logger.info(s"Message sent to dead letter queue with ID ${messageResult.getMessageId}")
+      case Failure(e) => s"Dead letter sendMessage Exception: ${e.getMessage}"
     }
-
   }
 
 }

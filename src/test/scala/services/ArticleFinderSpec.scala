@@ -1,4 +1,4 @@
-package scala.services
+package services
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
@@ -28,7 +28,8 @@ class ArticleFinderSpec extends AnyWordSpec with Matchers {
         assert(ArticleFinder.findBodyText(exampleJson) == None)
       }
       "retrieve the primary body text when there is more than one possible body text" in {
-        val articleWithMultipleBodyTexts = TestUtils.readJson(s"/exampleWithMultipleBodyTexts.json").as[OctopusBundle]
+        val articleWithMultipleBodyTexts =
+          TestUtils.readJson(s"/exampleWithMultipleBodyTexts.json").as[OctopusBundle]
         val articleWithBodyPanelAndTabularTexts =
           TestUtils.readJson(s"/exampleWithMultipleBodyPanelAndTabular.json").as[OctopusBundle]
         val expectedArticle = TestUtils.readJson(s"/article.json").as[OctopusArticle]

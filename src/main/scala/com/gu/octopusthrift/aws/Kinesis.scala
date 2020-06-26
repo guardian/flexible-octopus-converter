@@ -5,10 +5,8 @@ import java.util.UUID
 
 import com.amazonaws.services.kinesis.model.PutRecordRequest
 import com.amazonaws.services.kinesis.{ AmazonKinesis, AmazonKinesisClientBuilder }
-import com.gu.octopusthrift.services.Logging
-import play.api.libs.json._
-
 import com.gu.octopusthrift.Config
+import com.gu.octopusthrift.services.Logging
 
 class Kinesis(config: Config) extends Logging {
 

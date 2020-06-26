@@ -1,8 +1,6 @@
 package com.gu.octopusthrift.services
 
-import play.api.libs.json._
 import com.gu.octopusthrift.models._
-import com.gu.octopusthrift.services.Logging
 
 object ArticleFinder extends Logging {
 

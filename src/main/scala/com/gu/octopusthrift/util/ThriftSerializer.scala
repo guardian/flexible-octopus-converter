@@ -2,7 +2,7 @@ package com.gu.octopusthrift.util
 
 import java.io.ByteArrayInputStream
 
-import com.twitter.scrooge.{ ThriftStructCodec, ThriftStruct }
+import com.twitter.scrooge.{ ThriftStruct, ThriftStructCodec }
 import org.apache.thrift.protocol.TCompactProtocol
 import org.apache.thrift.transport.{ TIOStreamTransport, TMemoryBuffer }
 

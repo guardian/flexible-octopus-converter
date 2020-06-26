@@ -1,18 +1,18 @@
 package com.gu.octopusthrift
 
+import com.amazonaws.services.kinesis.model.Record
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
-import com.amazonaws.services.kinesis.model.Record
-import play.api.libs.json._
-import com.gu.octopusthrift.aws.{ Kinesis, SQS }
-import com.gu.octopusthrift.services.Logging
-import com.gu.octopusthrift.Config
-import com.gu.octopusthrift.models._
-import com.gu.octopusthrift.services.PayloadValidator.{ isValidBundle, validatePayload }
-import scala.jdk.CollectionConverters._
 import com.gu.flexibleoctopus.model.thrift._
-import com.gu.octopusthrift.util.ThriftSerializer.{ serializeToBytes }
-import scala.util.{ Try, Success }
+import com.gu.octopusthrift.aws.{ Kinesis, SQS }
+import com.gu.octopusthrift.models._
+import com.gu.octopusthrift.services.Logging
+import com.gu.octopusthrift.services.PayloadValidator.{ isValidBundle, validatePayload }
+import com.gu.octopusthrift.util.ThriftSerializer.serializeToBytes
+import play.api.libs.json._
+
+import scala.jdk.CollectionConverters._
+import scala.util.{ Failure, Success, Try }
 
 object Lambda extends Logging {
 
@@ -21,15 +21,19 @@ object Lambda extends Logging {
   def handler(lambdaInput: KinesisEvent, context: Context): Unit = {
     val records: List[Record] = lambdaInput.getRecords.asScala.map(_.getKinesis).toList
 
-    records.map(record => {
+    records.foreach(record => {
       val data = record.getData().array()
       val validatedPayload: Option[OctopusPayload] = validatePayload(data)
       val sequenceNumber = record.getSequenceNumber
 
-      validatedPayload.map(payload => {
+      validatedPayload.foreach(payload => {
         if (payload.bundles.isDefined) {
-          logger.info(s"Processing daily snapshot, sequence number: $sequenceNumber")
-          payload.bundles.get.map(bundle => processBundle(bundle, sequenceNumber))
+          val messageIndex = payload.thismessageindex.getOrElse(0)
+          val totalMessages = payload.totalmessages.getOrElse(0)
+          logger.info(
+            s"Processing daily snapshot, message $messageIndex of $totalMessages, sequence number: $sequenceNumber"
+          )
+          payload.bundles.get.foreach(bundle => processBundle(bundle, sequenceNumber))
         } else if (payload.data.isDefined) {
           logger.info(s"Processing single story bundle, sequence number: $sequenceNumber")
           processBundle(payload.data.get, sequenceNumber)
@@ -38,7 +42,6 @@ object Lambda extends Logging {
           deadLetterQueue.sendMessage(Json.toJson(payload))
         }
       })
-
     })
   }
 
@@ -47,15 +50,15 @@ object Lambda extends Logging {
 
     if (isValidBundle(octopusBundle)) {
       Try(octopusBundle.as[StoryBundle]) match {
-        case Success(bundle) => {
+        case Success(bundle) =>
           logger.info(s"Bundle passed validation, sequence number: $sequenceNumber")
           val serializedThriftBundle = serializeToBytes(bundle)
           stream.publish(serializedThriftBundle)
-        }
-        case _ => {
-          logger.info(s"Bundle failed validation as StoryBundle, sequence number: $sequenceNumber")
+        case Failure(e) =>
+          logger.info(
+            s"Bundle failed validation as StoryBundle, sequence number: $sequenceNumber, with error: ${e}"
+          )
           deadLetterQueue.sendMessage(Json.toJson(octopusBundle))
-        }
       }
     } else {
       logger.info(s"Bundle failed validation, sequence number: $sequenceNumber")

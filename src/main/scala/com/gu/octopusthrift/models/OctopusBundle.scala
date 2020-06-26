@@ -2,46 +2,50 @@ package com.gu.octopusthrift.models
 
 import java.util.concurrent.TimeUnit
 
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
-import com.gu.octopusthrift.models.OctopusArticle
 import com.gu.flexibleoctopus.model.thrift._
 import com.gu.octopusthrift.services.ArticleFinder
-import org.joda.time.{ DateTime, DateTimeZone }
 import org.joda.time.format.DateTimeFormat
+import org.joda.time.{ DateTime, DateTimeZone }
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
 /**
- * This model does not represent all fields sent by Octopus,
- * only those that will be relevant in converting to our Thrift model
- */
+  * This model does not represent all fields sent by Octopus,
+  * only those that will be relevant in converting to our Thrift model
+  */
 case class OctopusBundle(
-  id: Int,
-  info8: String,
-  pubCode: String,
-  pubDate: Option[String],
-  sectionCode: String,
-  articles: Array[OctopusArticle]) {
+    id: Int,
+    info8: String,
+    pubCode: String,
+    pubDate: Option[String],
+    sectionCode: String,
+    articles: Array[OctopusArticle]
+) {
   private val composerIdLocation = 7
 
   def composerId: Option[String] = {
     val i8 = info8.split(',')
-    i8.length > 7 match {
-      case true => Some(i8(composerIdLocation).trim)
-      case false => None
+    if (i8.length > 7) Some(i8(composerIdLocation).trim)
+    else {
+      None
     }
   }
-  def pubDateEpochDays =
+
+  def pubDateEpochDays: Option[Long] =
     pubDate.map(date =>
       TimeUnit.MILLISECONDS.toDays(
         DateTime
           .parse(date, DateTimeFormat.forPattern("yyyyMMdd").withZoneUTC())
           .withZone(DateTimeZone.UTC)
-          .getMillis))
-  def as[T](implicit f: OctopusBundle => T) = f(this)
+          .getMillis
+      )
+    )
+
+  def as[T](implicit f: OctopusBundle => T): T = f(this)
 }
 
 object OctopusBundle {
-  implicit val reads = ((__ \ "id").read[Int] and
+  implicit val reads: Reads[OctopusBundle] = ((__ \ "id").read[Int] and
     (__ \ "info8").read[String] and
     (__ \ "pubcode").read[String] and
     (__ \ "pubdate").readNullable[String] and
@@ -55,7 +59,7 @@ object OctopusBundle {
     (__ \ "sectionCode").write[String] and
     (__ \ "articles").write[Array[OctopusArticle]])(unlift(OctopusBundle.unapply))
 
-  implicit def bundleMapper = (octopusBundle: OctopusBundle) => {
+  implicit def bundleMapper: OctopusBundle => StoryBundle = (octopusBundle: OctopusBundle) => {
 
     val bodyText = ArticleFinder.findBodyText(octopusBundle)
     val article = bodyText.get.as[Article]
@@ -70,6 +74,7 @@ object OctopusBundle {
       headline,
       bodyText.flatMap(_.pageNumber),
       octopusBundle.pubDateEpochDays,
-      bodyText.flatMap(_.attachedTo.map(_.toString)))
+      bodyText.flatMap(_.attachedTo.map(_.toString))
+    )
   }
 }

@@ -1,4 +1,4 @@
-package scala.models
+package models
 
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -6,19 +6,20 @@ import com.gu.octopusthrift.models.OctopusArticle
 import com.gu.flexibleoctopus.model.thrift._
 
 object ArticleTestHelpers {
-  def createOctopusArticleWithPage(onPages: Option[String]) = OctopusArticle(
-    1234,
-    "article.t0",
-    "w",
-    "n",
-    "Body Text",
-    1,
-    "202006241200",
-    None,
-    "N",
-    "Writers",
-    Some(1000),
-    onPages)
+  def createOctopusArticleWithPage(onPages: Option[String]) =
+    OctopusArticle(
+      1234,
+      "article.t0",
+      "w",
+      "n",
+      "Body Text",
+      1,
+      "202006241200",
+      None,
+      "N",
+      "Writers",
+      Some(1000),
+      onPages)
 }
 
 class OctopusArticleSpec extends AnyWordSpec {
