@@ -111,4 +111,14 @@ class OctopusBundleSpec extends AnyWordSpec with Matchers {
       }
     }
   }
+  "composerId is called" should {
+    "correctly extract the Composer ID when present" in {
+      val bundle = TestUtils.readJson(s"/example.json").as[OctopusBundle]
+      bundle.composerId shouldBe Some("5ecd2cc68f087412dad10d1d")
+    }
+    "return a None when there's no Composer ID" in {
+      val bundle = TestUtils.readJson(s"/exampleWithNoComposerId.json").as[OctopusBundle]
+      bundle.composerId shouldBe None
+    }
+  }
 }

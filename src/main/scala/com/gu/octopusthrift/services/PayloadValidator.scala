@@ -12,7 +12,7 @@ object PayloadValidator extends Logging {
       case Success(json) =>
         json.validate[OctopusPayload] match {
           case JsSuccess(payload, _) => Some(payload)
-          case _: JsError => None
+          case _: JsError            => None
         }
       case _ => None
     }
@@ -20,9 +20,11 @@ object PayloadValidator extends Logging {
 
   def isValidBundle(bundle: OctopusBundle): Boolean = {
     logger.info(s"Validating bundle: $bundle")
-    logger.info(s"Composer ID: ${bundle.composerId}")
     bundle.articles.foreach(article => logger.info(s"Article: $article"))
     logger.info(s"Body text: ${ArticleFinder.findBodyText(bundle)}")
-    bundle.composerId.exists(id => id.length > 0) && ArticleFinder.findBodyText(bundle).isDefined
+    logger.info(s"Composer ID: ${bundle.composerId}")
+    val hasComposerId = bundle.composerId.isDefined
+    val hasBodyText = ArticleFinder.findBodyText(bundle).isDefined
+    hasComposerId && hasBodyText
   }
 }
