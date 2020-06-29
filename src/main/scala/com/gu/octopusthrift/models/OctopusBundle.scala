@@ -12,16 +12,17 @@ import play.api.libs.json._
 import scala.util.{ Try, Success }
 
 /**
- * This model does not represent all fields sent by Octopus,
- * only those that will be relevant in converting to our Thrift model
- */
+  * This model does not represent all fields sent by Octopus,
+  * only those that will be relevant in converting to our Thrift model
+  */
 case class OctopusBundle(
-  id: Int,
-  info8: String,
-  pubCode: String,
-  pubDate: Option[String],
-  sectionCode: String,
-  articles: Array[OctopusArticle]) {
+    id: Int,
+    info8: String,
+    pubCode: String,
+    pubDate: Option[String],
+    sectionCode: String,
+    articles: Array[OctopusArticle]
+) {
   private val composerIdLocation = 7
 
   def composerId: Option[String] = {
@@ -29,17 +30,22 @@ case class OctopusBundle(
     val possibleComposerId = Try(i8(composerIdLocation))
     (i8.length > 7, possibleComposerId) match {
       case (true, Success(id)) => if (id.trim.length > 0) Some(id.trim) else None
-      case _ => None
+      case _                   => None
     }
   }
 
-  def pubDateEpochDays: Option[Long] =
-    pubDate.map(date =>
-      TimeUnit.MILLISECONDS.toDays(
-        DateTime
-          .parse(date, DateTimeFormat.forPattern("yyyyMMdd").withZoneUTC())
-          .withZone(DateTimeZone.UTC)
-          .getMillis))
+  def pubDateEpochDays: Option[Long] = {
+    if (pubDate.exists(_.trim.nonEmpty)) {
+      pubDate.map(date =>
+        TimeUnit.MILLISECONDS.toDays(
+          DateTime
+            .parse(date, DateTimeFormat.forPattern("yyyyMMdd").withZoneUTC())
+            .withZone(DateTimeZone.UTC)
+            .getMillis
+        )
+      )
+    } else { None }
+  }
 
   def as[T](implicit f: OctopusBundle => T): T = f(this)
 }
@@ -74,6 +80,7 @@ object OctopusBundle {
       headline,
       bodyText.flatMap(_.pageNumber),
       octopusBundle.pubDateEpochDays,
-      bodyText.flatMap(_.attachedTo.map(_.toString)))
+      bodyText.flatMap(_.attachedTo.map(_.toString))
+    )
   }
 }

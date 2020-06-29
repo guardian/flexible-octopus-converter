@@ -27,7 +27,8 @@ class OctopusBundleSpec extends AnyWordSpec with Matchers {
           "N",
           "Writers",
           Some(1000),
-          Some("1"))
+          Some("1")
+        )
 
         val octopusBundle = OctopusBundle(2345, ",,,,,,,1", "", Some("20200624"), "", Array(octopusArticle))
 
@@ -52,7 +53,8 @@ class OctopusBundleSpec extends AnyWordSpec with Matchers {
           "N",
           "Writers",
           Some(1000),
-          Some("1"))
+          Some("1")
+        )
 
         val octopusBundle = OctopusBundle(2345, "", "", Some("20200624"), "", Array(octopusArticle))
 
@@ -108,6 +110,35 @@ class OctopusBundleSpec extends AnyWordSpec with Matchers {
         val thriftBundle = bundle.as[StoryBundle]
 
         thriftBundle.pageNumber shouldBe None
+      }
+      "handle empty optional values correctly when parsing into a StoryBundle" in {
+        val article = OctopusArticle(
+          15313009,
+          "Mesple.t01",
+          "B",
+          "P",
+          "Body Text",
+          1,
+          "202006291255",
+          Some(""), // in use by
+          "N",
+          "Desk",
+          Some(0),
+          Some("") // on pages
+        )
+        val bundle = OctopusBundle(
+          15313010,
+          "Mesple,483,,8,0,20200629125607,,5ef9bfff8f08aff12bef6572,20200629125602,0,Music,1",
+          "gdn",
+          Some(""), // pub date
+          "1jo",
+          Array(article)
+        )
+
+        val storyBundle = bundle.as[StoryBundle]
+
+        storyBundle.composerId shouldBe "5ef9bfff8f08aff12bef6572"
+
       }
     }
   }
