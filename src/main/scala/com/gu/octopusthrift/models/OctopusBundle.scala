@@ -73,6 +73,7 @@ object OctopusBundle {
 
     StoryBundle(
       octopusBundle.id,
+      // the PayloadValidator has confirmed before this point there there _is_ a Composer ID, so it should not be possible for a None value to be returned here
       octopusBundle.composerId.getOrElse(""),
       octopusBundle.pubCode,
       octopusBundle.sectionCode,
