@@ -10,20 +10,26 @@ import com.amazonaws.services.cloudwatch.model.StandardUnit
 import com.gu.octopusthrift.Config
 import com.gu.octopusthrift.services.Logging;
 
+object Metrics {
+  val MissingComposerIdOrBodyText = "MissingComposerIdOrBodyText"
+  val FailedThriftConversion = "FailedThriftConversion"
+  val MissingData = "MissingData"
+}
+
 class CloudWatch(config: Config) extends Logging {
 
   private val builder = AmazonCloudWatchClientBuilder.defaultClient()
 
   private lazy val cloudWatchClient = builder
 
-  def publishMetricEvent(): Unit = {
+  def publishMetricEvent(metric: String): Unit = {
 
     val dimension = new Dimension()
       .withName("Stage")
       .withValue(config.stage);
 
     val datum = new MetricDatum()
-      .withMetricName("VALIDATION_FAILED")
+      .withMetricName(metric)
       .withUnit(StandardUnit.Count)
       .withValue(1)
       .withDimensions(dimension)
