@@ -38,7 +38,7 @@ object Lambda extends Logging with CustomMetrics {
           processBundle(payload.data.get, sequenceNumber)
         } else {
           logger.info(s"Payload does not contain expected data, sequence number: $sequenceNumber")
-          cloudWatch.publishMetricEvent(Metrics.MissingData)
+          cloudWatch.publishMetricEvent(Metrics.MissingExpectedPayloadData)
           deadLetterQueue.sendMessage(Json.toJson(payload))
         }
       })
@@ -62,7 +62,7 @@ object Lambda extends Logging with CustomMetrics {
       }
     } else {
       logger.info(s"Bundle failed validation, sequence number: $sequenceNumber")
-      cloudWatch.publishMetricEvent(Metrics.MissingComposerIdOrBodyText)
+      cloudWatch.publishMetricEvent(Metrics.MissingMandatoryBundleData)
     }
   }
 

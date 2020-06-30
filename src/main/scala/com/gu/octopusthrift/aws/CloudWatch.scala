@@ -11,9 +11,9 @@ import com.gu.octopusthrift.Config
 import com.gu.octopusthrift.services.Logging;
 
 object Metrics {
-  val MissingComposerIdOrBodyText = "MissingComposerIdOrBodyText"
+  val MissingMandatoryBundleData = "MissingMandatoryBundleData"
   val FailedThriftConversion = "FailedThriftConversion"
-  val MissingData = "MissingData"
+  val MissingExpectedPayloadData = "MissingExpectedPayloadData"
 }
 
 class CloudWatch(config: Config) extends Logging {
