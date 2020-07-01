@@ -12,7 +12,10 @@ object PayloadValidator extends Logging {
       case Success(json) =>
         json.validate[OctopusPayload] match {
           case JsSuccess(payload, _) => Some(payload)
-          case _: JsError            => None
+          case _: JsError => {
+            logger.info(s"Payload does not match OctopusPayload model: $json")
+            None
+          }
         }
       case _ => None
     }

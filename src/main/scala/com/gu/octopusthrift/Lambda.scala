@@ -4,7 +4,7 @@ import com.amazonaws.services.kinesis.model.Record
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.gu.flexibleoctopus.model.thrift._
-import com.gu.octopusthrift.aws.{ CloudWatch, CustomMetrics, Kinesis, Metrics, SQS }
+import com.gu.octopusthrift.aws.{ CustomMetrics, Kinesis, Metrics, SQS }
 import com.gu.octopusthrift.models._
 import com.gu.octopusthrift.services.Logging
 import com.gu.octopusthrift.services.PayloadValidator.{ isValidBundle, validatePayload }
@@ -22,16 +22,20 @@ object Lambda extends Logging with CustomMetrics {
     val records: List[Record] = lambdaInput.getRecords.asScala.map(_.getKinesis).toList
 
     records.foreach(record => {
+      val sequenceNumber = record.getSequenceNumber
+      logger.info(s"Received payload, sequence number: $sequenceNumber")
+
       val data = record.getData().array()
       val validatedPayload: Option[OctopusPayload] = validatePayload(data)
-      val sequenceNumber = record.getSequenceNumber
 
       validatedPayload.foreach(payload => {
+        logger.info(s"Validated payload, sequence number: $sequenceNumber")
         if (payload.bundles.isDefined) {
           val messageIndex = payload.thismessageindex.getOrElse(0)
           val totalMessages = payload.totalmessages.getOrElse(0)
           logger.info(
-            s"Processing daily snapshot, message $messageIndex of $totalMessages, sequence number: $sequenceNumber")
+            s"Processing daily snapshot, message $messageIndex of $totalMessages, sequence number: $sequenceNumber"
+          )
           payload.bundles.get.foreach(bundle => processBundle(bundle, sequenceNumber))
         } else if (payload.data.isDefined) {
           logger.info(s"Processing single story bundle, sequence number: $sequenceNumber")
@@ -41,6 +45,7 @@ object Lambda extends Logging with CustomMetrics {
           cloudWatch.publishMetricEvent(Metrics.MissingExpectedPayloadData)
           deadLetterQueue.sendMessage(Json.toJson(payload))
         }
+        logger.info(s"Completed handling validated payload, sequence number: $sequenceNumber")
       })
     })
   }
@@ -56,7 +61,8 @@ object Lambda extends Logging with CustomMetrics {
           stream.publish(serializedThriftBundle)
         case Failure(e) =>
           logger.info(
-            s"Bundle failed validation as StoryBundle, sequence number: $sequenceNumber, with error: ${e}")
+            s"Bundle failed validation as StoryBundle, sequence number: $sequenceNumber, with error: $e"
+          )
           cloudWatch.publishMetricEvent(Metrics.FailedThriftConversion)
           deadLetterQueue.sendMessage(Json.toJson(octopusBundle))
       }
