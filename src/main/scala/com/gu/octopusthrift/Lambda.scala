@@ -4,7 +4,7 @@ import com.amazonaws.services.kinesis.model.Record
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.gu.flexibleoctopus.model.thrift._
-import com.gu.octopusthrift.aws.{ CustomMetrics, Kinesis, Metrics, SQS }
+import com.gu.octopusthrift.aws.{ CustomMetrics, DeadLetterQueue, Kinesis, Metrics }
 import com.gu.octopusthrift.models._
 import com.gu.octopusthrift.services.Logging
 import com.gu.octopusthrift.services.PayloadValidator.{ isValidBundle, validatePayload }
@@ -14,9 +14,7 @@ import play.api.libs.json._
 import scala.jdk.CollectionConverters._
 import scala.util.{ Failure, Success, Try }
 
-object Lambda extends Logging with CustomMetrics {
-
-  val deadLetterQueue = new SQS(Config.apply)
+object Lambda extends Logging with CustomMetrics with DeadLetterQueue {
 
   def handler(lambdaInput: KinesisEvent, context: Context): Unit = {
     val records: List[Record] = lambdaInput.getRecords.asScala.map(_.getKinesis).toList

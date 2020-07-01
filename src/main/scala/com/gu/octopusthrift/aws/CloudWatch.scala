@@ -14,6 +14,7 @@ object Metrics {
   val MissingMandatoryBundleData = "MissingMandatoryBundleData"
   val FailedThriftConversion = "FailedThriftConversion"
   val MissingExpectedPayloadData = "MissingExpectedPayloadData"
+  val InvalidOctopusPayload = "InvalidOctopusPayload"
 }
 
 class CloudWatch(config: Config) extends Logging {
@@ -24,9 +25,7 @@ class CloudWatch(config: Config) extends Logging {
 
   def publishMetricEvent(metric: String): Unit = {
 
-    val dimension = new Dimension()
-      .withName("Stage")
-      .withValue(config.stage);
+    val dimension = new Dimension().withName("Stage").withValue(config.stage);
 
     val datum = new MetricDatum()
       .withMetricName(metric)
@@ -34,9 +33,7 @@ class CloudWatch(config: Config) extends Logging {
       .withValue(1)
       .withDimensions(dimension)
 
-    val request = new PutMetricDataRequest()
-      .withNamespace("OctopusLambda")
-      .withMetricData(datum)
+    val request = new PutMetricDataRequest().withNamespace("OctopusLambda").withMetricData(datum)
 
     try {
       val result = cloudWatchClient.putMetricData(request)
