@@ -6,7 +6,7 @@ import play.api.libs.json._
 
 import scala.util.{ Success, Try }
 
-object PayloadValidator extends Logging with CustomMetrics with DeadLetterQueue {
+object PayloadValidator extends Logging {
 
   def validateSinglePayload(data: Array[Byte]): Option[OctopusSingleBundlePayload] = {
     Try(Json.parse(data)) match {
