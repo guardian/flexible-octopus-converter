@@ -12,17 +12,16 @@ import play.api.libs.json._
 import scala.util.{ Try, Success }
 
 /**
-  * This model does not represent all fields sent by Octopus,
-  * only those that will be relevant in converting to our Thrift model
-  */
+ * This model does not represent all fields sent by Octopus,
+ * only those that will be relevant in converting to our Thrift model
+ */
 case class OctopusBundle(
-    id: Int,
-    info8: String,
-    pubCode: String,
-    pubDate: Option[String],
-    sectionCode: String,
-    articles: Array[OctopusArticle]
-) {
+  id: Int,
+  info8: String,
+  pubcode: String,
+  pubdate: Option[String],
+  sectioncode: String,
+  articles: Array[OctopusArticle]) {
   private val composerIdLocation = 7
 
   def composerId: Option[String] = {
@@ -30,20 +29,18 @@ case class OctopusBundle(
     val possibleComposerId = Try(i8(composerIdLocation))
     (i8.length > 7, possibleComposerId) match {
       case (true, Success(id)) => if (id.trim.length > 0) Some(id.trim) else None
-      case _                   => None
+      case _ => None
     }
   }
 
   def pubDateEpochDays: Option[Long] = {
-    if (pubDate.exists(_.trim.nonEmpty)) {
-      pubDate.map(date =>
+    if (pubdate.exists(_.trim.nonEmpty)) {
+      pubdate.map(date =>
         TimeUnit.MILLISECONDS.toDays(
           DateTime
             .parse(date, DateTimeFormat.forPattern("yyyyMMdd").withZoneUTC())
             .withZone(DateTimeZone.UTC)
-            .getMillis
-        )
-      )
+            .getMillis))
     } else { None }
   }
 
@@ -51,19 +48,8 @@ case class OctopusBundle(
 }
 
 object OctopusBundle {
-  implicit val reads: Reads[OctopusBundle] = ((__ \ "id").read[Int] and
-    (__ \ "info8").read[String] and
-    (__ \ "pubcode").read[String] and
-    (__ \ "pubdate").readNullable[String] and
-    (__ \ "sectioncode").read[String] and
-    (__ \ "articles").read[Array[OctopusArticle]])(OctopusBundle.apply _)
 
-  implicit val writes: Writes[OctopusBundle] = ((__ \ "id").write[Int] and
-    (__ \ "info8").write[String] and
-    (__ \ "pubCode").write[String] and
-    (__ \ "pubDate").writeNullable[String] and
-    (__ \ "sectionCode").write[String] and
-    (__ \ "articles").write[Array[OctopusArticle]])(unlift(OctopusBundle.unapply))
+  implicit val formats: Format[OctopusBundle] = Json.format[OctopusBundle]
 
   implicit def bundleMapper: OctopusBundle => StoryBundle = (octopusBundle: OctopusBundle) => {
 
@@ -75,13 +61,12 @@ object OctopusBundle {
       octopusBundle.id,
       // the PayloadValidator has confirmed before this point there there _is_ a Composer ID, so it should not be possible for a None value to be returned here
       octopusBundle.composerId.getOrElse(""),
-      octopusBundle.pubCode,
-      octopusBundle.sectionCode,
+      octopusBundle.pubcode,
+      octopusBundle.sectioncode,
       article,
       headline,
       bodyText.flatMap(_.pageNumber),
       octopusBundle.pubDateEpochDays,
-      bodyText.flatMap(_.attachedTo.map(_.toString))
-    )
+      bodyText.flatMap(_.attached_to.map(_.toString)))
   }
 }
