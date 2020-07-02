@@ -7,7 +7,7 @@ case class OctopusBundleCacheData(
   thismessageindex: Option[Int],
   totalmessages: Option[Int])
 object OctopusBundleCacheData {
-  implicit val bundleCacheDataFormat = Json.format[OctopusBundleCacheData]
+  implicit val bundleCacheDataFormat = Json.reads[OctopusBundleCacheData]
 }
 
 /**
@@ -26,13 +26,9 @@ object OctopusBundleCachePayload {
     ((__ \ "type").read[String](typeReads) and (__ \ "data")
       .readNullable[OctopusBundleCacheData])(OctopusBundleCachePayload.apply _)
 
-  implicit val writes: Writes[OctopusBundleCachePayload] =
-    ((__ \ "type").write[String] and (__ \ "data").writeNullable[OctopusBundleCacheData])(
-      unlift(OctopusBundleCachePayload.unapply))
-
 }
 
 case class OctopusSingleBundlePayload(`type`: String, data: Option[OctopusBundle])
 object OctopusSingleBundlePayload {
-  implicit val singleBundleFormat = Json.format[OctopusSingleBundlePayload]
+  implicit val singleBundleFormat = Json.reads[OctopusSingleBundlePayload]
 }
