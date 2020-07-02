@@ -35,5 +35,25 @@ class PayloadValidatorSpec extends AnyWordSpec with Matchers {
         PayloadValidator.isValidBundle(exampleJson) shouldBe true
       }
     }
+    "validateSinglePayload is called" should {
+      "correctly identify a single bundle payload" in {
+        val exampleJson = TestUtils.readJson(s"/exampleBundleObject.json")
+        PayloadValidator.validateSinglePayload(Json.toBytes(exampleJson)).isDefined shouldBe true
+      }
+      "return None for any other payload" in {
+        val exampleJson = TestUtils.readJson(s"/exampleBundleCache.json")
+        PayloadValidator.validateSinglePayload(Json.toBytes(exampleJson)).isEmpty shouldBe true
+      }
+    }
+    "validateCachePayload is called" should {
+      "correctly identify a cache payload" in {
+        val exampleJson = TestUtils.readJson(s"/exampleBundleCache.json")
+        PayloadValidator.validateCachePayload(Json.toBytes(exampleJson)).isDefined shouldBe true
+      }
+      "return None for any other payload" in {
+        val exampleJson = TestUtils.readJson(s"/exampleBundleObject.json")
+        PayloadValidator.validateCachePayload(Json.toBytes(exampleJson)).isEmpty shouldBe true
+      }
+    }
   }
 }

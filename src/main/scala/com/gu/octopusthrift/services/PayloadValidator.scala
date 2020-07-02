@@ -6,19 +6,25 @@ import play.api.libs.json._
 
 import scala.util.{ Success, Try }
 
-object PayloadValidator extends Logging with CustomMetrics with DeadLetterQueue {
+object PayloadValidator extends Logging {
 
-  def validatePayload(decodedData: Array[Byte]): Option[OctopusPayload] = {
-    Try(Json.parse(decodedData)) match {
+  def validateSinglePayload(data: Array[Byte]): Option[OctopusSingleBundlePayload] = {
+    Try(Json.parse(data)) match {
       case Success(json) =>
-        json.validate[OctopusPayload] match {
+        json.validate[OctopusSingleBundlePayload] match {
           case JsSuccess(payload, _) => Some(payload)
-          case _: JsError => {
-            logger.info(s"Payload does not match OctopusPayload model: $json")
-            deadLetterQueue.sendMessage(json)
-            cloudWatch.publishMetricEvent(Metrics.InvalidOctopusPayload)
-            None
-          }
+          case _: JsError => None
+        }
+      case _ => None
+    }
+  }
+
+  def validateCachePayload(data: Array[Byte]): Option[OctopusBundleCachePayload] = {
+    Try(Json.parse(data)) match {
+      case Success(json) =>
+        json.validate[OctopusBundleCachePayload] match {
+          case JsSuccess(payload, _) => Some(payload)
+          case _: JsError => None
         }
       case _ => None
     }

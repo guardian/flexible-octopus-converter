@@ -17,26 +17,26 @@ import scala.util.{ Success, Try }
 case class OctopusArticle(
   id: Int,
   filename: String,
-  forPublication: String,
+  for_publication: String,
   lawyered: String,
-  objectType: String,
-  objectNumber: Int,
-  lastModified: String,
-  inUseBy: Option[String],
-  isCheckedOut: String,
+  object_type: String,
+  object_number: Int,
+  last_modified: String,
+  in_use_by: Option[String],
+  ischeckedout: String,
   status: String,
-  attachedTo: Option[Int],
-  onPages: Option[String]) {
+  attached_to: Option[Int],
+  on_pages: Option[String]) {
 
   def lastModifiedEpoch: Long =
     TimeUnit.MILLISECONDS.toSeconds(
       DateTime
-        .parse(lastModified, DateTimeFormat.forPattern("yyyyMMddHHmm").withZoneUTC())
+        .parse(last_modified, DateTimeFormat.forPattern("yyyyMMddHHmm").withZoneUTC())
         .withZone(DateTimeZone.UTC)
         .getMillis)
 
   def pageNumber: Option[Long] = {
-    Try(onPages.map(_.split(',')(0).split(';')(0).toLong)) match {
+    Try(on_pages.map(_.split(',')(0).split(';')(0).toLong)) match {
       case Success(number) => number
       case _ => None
     }
@@ -47,31 +47,7 @@ case class OctopusArticle(
 
 object OctopusArticle {
 
-  implicit val reads: Reads[OctopusArticle] = ((__ \ "id").read[Int] and
-    (__ \ "filename").read[String] and
-    (__ \ "for_publication").read[String] and
-    (__ \ "lawyered").read[String] and
-    (__ \ "object_type").read[String] and
-    (__ \ "object_number").read[Int] and
-    (__ \ "last_modified").read[String] and
-    (__ \ "in_use_by").readNullable[String] and
-    (__ \ "ischeckedout").read[String] and
-    (__ \ "status").read[String] and
-    (__ \ "attached_to").readNullable[Int] and
-    (__ \ "on_pages").readNullable[String])(OctopusArticle.apply _)
-
-  implicit val writes: Writes[OctopusArticle] = ((__ \ "id").write[Int] and
-    (__ \ "filename").write[String] and
-    (__ \ "for_publication").write[String] and
-    (__ \ "lawyered").write[String] and
-    (__ \ "object_type").write[String] and
-    (__ \ "object_number").write[Int] and
-    (__ \ "last_modified").write[String] and
-    (__ \ "in_use_by").writeNullable[String] and
-    (__ \ "ischeckedout").write[String] and
-    (__ \ "status").write[String] and
-    (__ \ "attached_to").writeNullable[Int] and
-    (__ \ "on_pages").writeNullable[String])(unlift(OctopusArticle.unapply))
+  implicit val formats: Format[OctopusArticle] = Json.format[OctopusArticle]
 
   implicit def articleMapper: OctopusArticle => Article = (octopusArticle: OctopusArticle) => {
 
@@ -97,9 +73,9 @@ object OctopusArticle {
 
     Article(
       octopusArticle.id,
-      forPub(octopusArticle.forPublication.toLowerCase),
-      octopusArticle.inUseBy,
-      isCheckedOut(octopusArticle.isCheckedOut.toLowerCase),
+      forPub(octopusArticle.for_publication.toLowerCase),
+      octopusArticle.in_use_by,
+      isCheckedOut(octopusArticle.ischeckedout.toLowerCase),
       octopusArticle.lastModifiedEpoch,
       lawyered(octopusArticle.lawyered.toLowerCase),
       articleStatus(octopusArticle.status.toLowerCase),

@@ -15,13 +15,13 @@ object ArticleFinder extends Logging {
   private val forWebCodes = Seq("w", "b")
 
   private def hasBodyTextForWebPublication(article: OctopusArticle): Boolean = {
-    bodyTextObjectTypes.contains(article.objectType) && forWebCodes.contains(
-      article.forPublication.toLowerCase()) && article.objectNumber == 1 // we want the first of any given object type
+    bodyTextObjectTypes.contains(article.object_type) && forWebCodes.contains(
+      article.for_publication.toLowerCase()) && article.object_number == 1 // we want the first of any given object type
   }
 
   // Where we have more than one type of body text object, the 'Body Text' takes precedence
   private def getPriorityBodyText(bodyTexts: Array[OctopusArticle]): Option[OctopusArticle] = {
-    val bodyText = bodyTexts.find(_.objectType == "Body Text")
+    val bodyText = bodyTexts.find(_.object_type == "Body Text")
 
     bodyText match {
       case Some(_) => bodyText

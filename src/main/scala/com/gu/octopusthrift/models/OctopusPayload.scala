@@ -2,23 +2,33 @@ package com.gu.octopusthrift.models
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-
-/** This model represents part of the payload received from Octopus */
-case class OctopusPayload(
-  `type`: String,
+case class OctopusBundleCacheData(
   bundles: Option[Array[OctopusBundle]],
-  data: Option[OctopusBundle],
   thismessageindex: Option[Int],
   totalmessages: Option[Int])
+object OctopusBundleCacheData {
+  implicit val bundleCacheDataFormat = Json.reads[OctopusBundleCacheData]
+}
 
-object OctopusPayload {
-  implicit val reads: Reads[OctopusPayload] =
-    ((__ \ "type").read[String] and (__ \ "bundles").readNullable[Array[OctopusBundle]] and (__ \ "data")
-      .readNullable[OctopusBundle] and (__ \ "thismessageindex").readNullable[Int] and (__ \ "totalmessages")
-      .readNullable[Int])(OctopusPayload.apply _)
+/**
+ * The following models represent the possible payload shapes we can receive from Octopus
+ *  - the OctopusBundleCachePayload represents a daily snapshot of Octopus data, containing multiple story bundles
+ *  - the OctopusSingleBundlePayload represents an update to a single story bundle
+ */
+case class OctopusBundleCachePayload(`type`: String, data: Option[OctopusBundleCacheData])
+object OctopusBundleCachePayload {
 
-  implicit val writes: Writes[OctopusPayload] =
-    ((__ \ "type").write[String] and (__ \ "bundles").writeNullable[Array[OctopusBundle]] and (__ \ "data")
-      .writeNullable[OctopusBundle] and (__ \ "thismessageindex")
-      .writeNullable[Int] and (__ \ "totalmessages").writeNullable[Int])(unlift(OctopusPayload.unapply))
+  val typeReads = Reads.StringReads.filter(str => {
+    str.matches("bundlecache")
+  })
+
+  implicit val reads: Reads[OctopusBundleCachePayload] =
+    ((__ \ "type").read[String](typeReads) and (__ \ "data")
+      .readNullable[OctopusBundleCacheData])(OctopusBundleCachePayload.apply _)
+
+}
+
+case class OctopusSingleBundlePayload(`type`: String, data: Option[OctopusBundle])
+object OctopusSingleBundlePayload {
+  implicit val singleBundleFormat = Json.reads[OctopusSingleBundlePayload]
 }
