@@ -18,9 +18,7 @@ object OctopusBundleCacheData {
 case class OctopusBundleCachePayload(`type`: String, data: Option[OctopusBundleCacheData])
 object OctopusBundleCachePayload {
 
-  val typeReads = Reads.StringReads.filter(str => {
-    str.matches("bundlecache")
-  })
+  val typeReads = Reads.StringReads.filter(_.matches("bundlecache"))
 
   implicit val reads: Reads[OctopusBundleCachePayload] =
     ((__ \ "type").read[String](typeReads) and (__ \ "data")
@@ -30,5 +28,10 @@ object OctopusBundleCachePayload {
 
 case class OctopusSingleBundlePayload(`type`: String, data: Option[OctopusBundle])
 object OctopusSingleBundlePayload {
-  implicit val singleBundleFormat = Json.reads[OctopusSingleBundlePayload]
+
+  val typeReads = Reads.StringReads.filter(_.matches("bundle"))
+
+  implicit val reads: Reads[OctopusSingleBundlePayload] =
+    ((__ \ "type").read[String](typeReads) and (__ \ "data")
+      .readNullable[OctopusBundle])(OctopusSingleBundlePayload.apply _)
 }
