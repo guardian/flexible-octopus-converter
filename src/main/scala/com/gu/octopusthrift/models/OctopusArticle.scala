@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit
 import com.gu.flexibleoctopus.model.thrift._
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.{ DateTime, DateTimeZone }
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 import scala.util.{ Success, Try }
@@ -26,7 +25,7 @@ case class OctopusArticle(
   ischeckedout: String,
   status: String,
   attached_to: Option[Int],
-  on_pages: Option[String]) {
+  on_pages: Option[String]) extends Ordered[OctopusArticle] {
 
   def lastModifiedEpoch: Long =
     TimeUnit.MILLISECONDS.toSeconds(
@@ -43,6 +42,8 @@ case class OctopusArticle(
   }
 
   def as[T](implicit f: OctopusArticle => T): T = f(this)
+
+  override def compare(that: OctopusArticle): Int = this.object_number compareTo that.object_number
 }
 
 object OctopusArticle {

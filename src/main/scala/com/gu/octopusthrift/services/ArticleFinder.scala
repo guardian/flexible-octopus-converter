@@ -1,32 +1,75 @@
 package com.gu.octopusthrift.services
 
 import com.gu.octopusthrift.models._
+import scala.util.{ Failure, Success, Try }
 
 object ArticleFinder extends Logging {
 
+  private val BodyText = "Body Text"
+  private val PanelText = "Panel Text"
+  private val TabularText = "Tabular Text"
+  private val ForBoth = "b"
+  private val ForWeb = "w"
+  private val ForPrint = "p"
+
+  // Order of precedence for object types: body over panel over tabular
+  private val bodyTextObjects = List(BodyText, PanelText, TabularText)
+
+  // Sometimes, object types look like Body Text [Ruled] and we don't care about the part in brackets
+  private def cleanObjectType(objectType: String): String = objectType.split("\\[").head.trim
+
+  // Prefer articles that are labelled both, then web, then print
+  private def articlesForPreferredDestination(
+      articles: Map[String, Array[OctopusArticle]]
+  ): Array[OctopusArticle] = {
+    (Try(articles(ForBoth)), Try(articles(ForWeb)), Try(articles(ForPrint))) match {
+      case (Success(forBoth), _, _)                    => forBoth
+      case (Failure(_), Success(forWeb), _)            => forWeb
+      case (Failure(_), Failure(_), Success(forPrint)) => forPrint
+      case _                                           => Array.empty[OctopusArticle]
+    }
+  }
+
+  // Prefer Body Text, then Panel Text, then Tabular Text
+  private def articlesOfPreferredObjectType(
+      articles: Map[String, Array[OctopusArticle]]
+  ): Array[OctopusArticle] = {
+    val bodyText = Try(articles(BodyText))
+    val panelText = Try(articles(PanelText))
+    val tabularText = Try(articles(TabularText))
+
+    (bodyText, panelText, tabularText) match {
+      case (Success(bodyTexts), _, _)                      => bodyTexts
+      case (Failure(_), Success(panelTexts), _)            => panelTexts
+      case (Failure(_), Failure(_), Success(tabularTexts)) => tabularTexts
+      case _                                               => Array.empty[OctopusArticle]
+    }
+  }
+
+  /*  Given a bundle with a series of articles, we want to find the 'primary' body text article
+   1. If some are for publication in print and some are web/both, discard the print ones
+   2. If we still have more than one and the object types are mixed discard all tabular components
+   3. If we still have more than one and the object types are mixed discard all panel components
+   4. If we still have more than one, pick the one with the lowest object_number.
+   */
   def findBodyText(bundle: OctopusBundle): Option[OctopusArticle] = {
-    val bodyTexts: Array[OctopusArticle] =
-      bundle.articles.filter(hasBodyTextForWebPublication)
-    getPriorityBodyText(bodyTexts)
-  }
 
-  private val bodyTextObjectTypes =
-    Seq("Body Text", "Tabular Text", "Panel Text")
-  private val forWebCodes = Seq("w", "b")
+    val onlyBodyTextArticles: Array[OctopusArticle] =
+      bundle.articles
+        .map(a => a.copy(object_type = cleanObjectType(a.object_type)))
+        .filter(a => bodyTextObjects.contains(a.object_type))
 
-  private def hasBodyTextForWebPublication(article: OctopusArticle): Boolean = {
-    bodyTextObjectTypes.contains(article.object_type) && forWebCodes.contains(
-      article.for_publication.toLowerCase()) && article.object_number == 1 // we want the first of any given object type
-  }
+    if (onlyBodyTextArticles.isEmpty)
+      None
+    else if (onlyBodyTextArticles.length == 1)
+      onlyBodyTextArticles.headOption
+    else {
+      val groupedByDestination = onlyBodyTextArticles.groupBy(_.for_publication.toLowerCase)
 
-  // Where we have more than one type of body text object, the 'Body Text' takes precedence
-  private def getPriorityBodyText(bodyTexts: Array[OctopusArticle]): Option[OctopusArticle] = {
-    val bodyText = bodyTexts.find(_.object_type == "Body Text")
+      val forPreferredDestinationAndGroupedByType =
+        articlesForPreferredDestination(groupedByDestination).groupBy(_.object_type)
 
-    bodyText match {
-      case Some(_) => bodyText
-      case _ if !bodyTexts.isEmpty => Some(bodyTexts.head)
-      case _ => None
+      articlesOfPreferredObjectType(forPreferredDestinationAndGroupedByType).sorted.headOption
     }
   }
 
