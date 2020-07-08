@@ -2,9 +2,10 @@ package models
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
-
 import com.gu.octopusthrift.models.{ OctopusArticle, OctopusBundle }
 import com.gu.flexibleoctopus.model.thrift._
+
+import scala.util.Try
 
 object BundleTestHelpers {
   def createOctopusBundleWithArticle(article: OctopusArticle) =
@@ -15,30 +16,45 @@ class OctopusBundleSpec extends AnyWordSpec with Matchers {
   "OctopusBundle" when {
     "as[StoryBundle] is called" should {
       "map the values correctly" in {
-        val octopusArticle = OctopusArticle(
-          1234,
-          "article.t0",
-          "w",
-          "n",
-          "Body Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1")
-        )
 
-        val octopusBundle = OctopusBundle(2345, ",,,,,,,1", "", Some("20200624"), "", Array(octopusArticle))
+        def createArticle(forPublication: String) =
+          OctopusArticle(
+            1234,
+            "article.t0",
+            forPublication,
+            "n",
+            "Body Text",
+            1,
+            "202006241200",
+            None,
+            "N",
+            "Writers",
+            Some(1000),
+            Some("1")
+          )
 
-        val thriftBundle = octopusBundle.as[StoryBundle]
+        def createBundle(article: OctopusArticle) =
+          OctopusBundle(2345, ",,,,,,,1", "", Some("20200624"), "", Array(article))
 
-        assert(thriftBundle.bodyText.id == 1234)
-        assert(thriftBundle.composerId == "1")
-        assert(thriftBundle.pageNumber == Some(1))
-        assert(thriftBundle.printPublicationDate == Some(18437))
-        assert(thriftBundle.octopusLayoutId == Some("1000"))
+        val octopusArticleForWeb = createArticle("w")
+        val octopusArticleForPrint = createArticle("p")
+        val octopusArticleForBoth = createArticle("b")
+
+        val octopusBundleForWeb = createBundle(octopusArticleForWeb)
+        val octopusBundleForPrint = createBundle(octopusArticleForPrint)
+        val octopusBundleForBoth = createBundle(octopusArticleForBoth)
+
+        val thriftBundleForWeb = octopusBundleForWeb.as[StoryBundle]
+        val thriftBundleForPrint = Try(octopusBundleForPrint.as[StoryBundle])
+        val thriftBundleForBoth = Try(octopusBundleForBoth.as[StoryBundle])
+
+        assert(thriftBundleForPrint.isSuccess)
+        assert(thriftBundleForBoth.isSuccess)
+        assert(thriftBundleForWeb.bodyText.id == 1234)
+        assert(thriftBundleForWeb.composerId == "1")
+        assert(thriftBundleForWeb.pageNumber == Some(1))
+        assert(thriftBundleForWeb.printPublicationDate == Some(18437))
+        assert(thriftBundleForWeb.octopusLayoutId == Some("1000"))
       }
       "handle no info8 data" in {
         val octopusArticle = OctopusArticle(
