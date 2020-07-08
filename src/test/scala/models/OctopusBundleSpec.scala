@@ -52,7 +52,6 @@ class OctopusBundleSpec extends AnyWordSpec with Matchers {
         assert(thriftBundleForBoth.isSuccess)
         assert(thriftBundleForWeb.bodyText.id == 1234)
         assert(thriftBundleForWeb.composerId == "1")
-        assert(thriftBundleForWeb.composerId == "1")
         assert(thriftBundleForWeb.pageNumber == Some(1))
         assert(thriftBundleForWeb.printPublicationDate == Some(18437))
         assert(thriftBundleForWeb.octopusLayoutId == Some("1000"))
