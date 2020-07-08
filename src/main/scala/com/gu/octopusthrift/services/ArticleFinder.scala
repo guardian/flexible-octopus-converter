@@ -8,9 +8,13 @@ object ArticleFinder extends Logging {
   private val BodyText = "Body Text"
   private val PanelText = "Panel Text"
   private val TabularText = "Tabular Text"
+
   private val ForBoth = "b"
   private val ForWeb = "w"
   private val ForPrint = "p"
+
+  // There are other possible destinations, 'Y' and 'N', which we don't care about
+  private val validPublicationDestinations = Set(ForBoth, ForWeb, ForPrint)
 
   // Order of precedence for object types: body over panel over tabular
   private val bodyTextObjects = List(BodyText, PanelText, TabularText)
@@ -20,31 +24,33 @@ object ArticleFinder extends Logging {
 
   // Prefer articles that are labelled both, then web, then print
   private def articlesForPreferredDestination(
-    articles: Map[String, Array[OctopusArticle]]): Array[OctopusArticle] = {
+      articles: Map[String, Array[OctopusArticle]]
+  ): Array[OctopusArticle] = {
     val forBoth = Try(articles(ForBoth))
     val forWeb = Try(articles(ForWeb))
     val forPrint = Try(articles(ForPrint))
 
     (forBoth, forWeb, forPrint) match {
-      case (Success(both), _, _) => both
-      case (Failure(_), Success(web), _) => web
+      case (Success(both), _, _)                    => both
+      case (Failure(_), Success(web), _)            => web
       case (Failure(_), Failure(_), Success(print)) => print
-      case _ => Array.empty[OctopusArticle]
+      case _                                        => Array.empty[OctopusArticle]
     }
   }
 
   // Prefer Body Text, then Panel Text, then Tabular Text
   private def articlesOfPreferredObjectType(
-    articles: Map[String, Array[OctopusArticle]]): Array[OctopusArticle] = {
+      articles: Map[String, Array[OctopusArticle]]
+  ): Array[OctopusArticle] = {
     val bodyText = Try(articles(BodyText))
     val panelText = Try(articles(PanelText))
     val tabularText = Try(articles(TabularText))
 
     (bodyText, panelText, tabularText) match {
-      case (Success(bodyTexts), _, _) => bodyTexts
-      case (Failure(_), Success(panelTexts), _) => panelTexts
+      case (Success(bodyTexts), _, _)                      => bodyTexts
+      case (Failure(_), Success(panelTexts), _)            => panelTexts
       case (Failure(_), Failure(_), Success(tabularTexts)) => tabularTexts
-      case _ => Array.empty[OctopusArticle]
+      case _                                               => Array.empty[OctopusArticle]
     }
   }
 
@@ -71,7 +77,9 @@ object ArticleFinder extends Logging {
     else {
       // Given a number of suitable articles, group them by their publication destination
       val groupedByDestination: Map[String, Array[OctopusArticle]] =
-        onlyBodyTextArticles.groupBy(_.for_publication.toLowerCase)
+        onlyBodyTextArticles
+          .groupBy(_.for_publication.toLowerCase)
+          .filter(groupedArticles => validPublicationDestinations.contains(groupedArticles._1.toLowerCase))
 
       // Pick the available articles for the destination we prefer the most, then group them by object type
       val forPreferredDestinationAndGroupedByType: Map[String, Array[OctopusArticle]] =

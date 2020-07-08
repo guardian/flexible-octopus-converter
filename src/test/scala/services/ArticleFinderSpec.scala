@@ -65,6 +65,13 @@ class ArticleFinderSpec extends AnyWordSpec with Matchers {
 
         assert(ArticleFinder.findBodyText(createTestBundle(articles)).contains(articleForWeb))
       }
+      "ignore 'for_publication' values of 'n' and 'y'" in {
+        val articleOne = createTestArticle("y", "Body Text", 1)
+        val articleTwo = createTestArticle("n", "Body Text", 1)
+        val articles = Array(articleOne, articleTwo)
+
+        assert(ArticleFinder.findBodyText(createTestBundle(articles)).isEmpty)
+      }
       "prefer 'object_type' of Body Text to other types" in {
         val articleObjectOne = createTestArticle("w", "Tabular Text", 1)
         val articleObjectTwo = createTestArticle("w", "Body Text [Ruled]", 1)
