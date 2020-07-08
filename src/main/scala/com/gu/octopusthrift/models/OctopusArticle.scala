@@ -52,7 +52,7 @@ object OctopusArticle {
 
   implicit def articleMapper: OctopusArticle => Article = (octopusArticle: OctopusArticle) => {
 
-    val forPub = Map("w" -> ForPublication.Web, "b" -> ForPublication.Both)
+    val forPub = Map("w" -> ForPublication.Web, "b" -> ForPublication.Both, "p" -> ForPublication.Print)
 
     val lawyered = Map(
       "n" -> Lawyered.Notapplicable,
