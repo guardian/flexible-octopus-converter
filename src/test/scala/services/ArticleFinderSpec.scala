@@ -8,6 +8,23 @@ import com.gu.octopusthrift.models._
 
 class ArticleFinderSpec extends AnyWordSpec with Matchers {
 
+  def createTestArticle(forPublication: String, objectType: String, objectNumber: Int) =
+    OctopusArticle(
+      1233,
+      "article.t0",
+      forPublication,
+      "n",
+      objectType,
+      objectNumber,
+      "202006241200",
+      None,
+      "N",
+      "Writers",
+      Some(1000),
+      Some("1"))
+
+  def createTestBundle(articles: Array[OctopusArticle]) = OctopusBundle(101, "", "", Some(""), "", articles)
+
   "ArticleFinder" when {
     "findBodyText is called" should {
       "retrieve the body text when it's present" in {
@@ -33,283 +50,60 @@ class ArticleFinderSpec extends AnyWordSpec with Matchers {
         assert(ArticleFinder.findBodyText(articleWithMultipleBodyTexts).contains(expectedArticle))
         assert(ArticleFinder.findBodyText(articleWithBodyPanelAndTabularTexts).contains(expectedArticle))
       }
-      "prefer both to web and print" in {
-        val articleForWeb = OctopusArticle(
-          1233,
-          "article.t0",
-          "w",
-          "n",
-          "Body Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-        val articleForPrint = OctopusArticle(
-          1234,
-          "article.t0",
-          "p",
-          "n",
-          "Body Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-        val articleForBoth = OctopusArticle(
-          1233,
-          "article.t0",
-          "b",
-          "n",
-          "Body Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-
+      "prefer 'for_publication' of both to web and print" in {
+        val articleForWeb = createTestArticle("w", "Body Text", 1)
+        val articleForPrint = createTestArticle("p", "Body Text", 1)
+        val articleForBoth = createTestArticle("b", "Body Text", 1)
         val articles = Array(articleForPrint, articleForWeb, articleForBoth)
 
-        val bundle = OctopusBundle(101, "", "", Some(""), "", articles)
-
-        assert(ArticleFinder.findBodyText(bundle).contains(articleForBoth))
+        assert(ArticleFinder.findBodyText(createTestBundle(articles)).contains(articleForBoth))
       }
-      "prefer web to print" in {
-        val articleForWeb = OctopusArticle(
-          1233,
-          "article.t0",
-          "w",
-          "n",
-          "Body Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-        val articleForPrint = OctopusArticle(
-          1234,
-          "article.t0",
-          "p",
-          "n",
-          "Body Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-
+      "prefer 'for_publication' of web to print" in {
+        val articleForWeb = createTestArticle("w", "Body Text", 1)
+        val articleForPrint = createTestArticle("p", "Body Text", 1)
         val articles = Array(articleForPrint, articleForWeb)
 
-        val bundle = OctopusBundle(101, "", "", Some(""), "", articles)
-
-        assert(ArticleFinder.findBodyText(bundle).contains(articleForWeb))
+        assert(ArticleFinder.findBodyText(createTestBundle(articles)).contains(articleForWeb))
       }
-      "prefer Body Text to other types" in {
-        val articleObjectOne = OctopusArticle(
-          1233,
-          "article.t0",
-          "w",
-          "n",
-          "Tabular Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-        val articleObjectTwo = OctopusArticle(
-          1234,
-          "article.t0",
-          "w",
-          "n",
-          "Body Text [Ruled]",
-          2,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-        val articleObjectThree = OctopusArticle(
-          1234,
-          "article.t0",
-          "w",
-          "n",
-          "Panel Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-        val articleObjectFour = OctopusArticle(
-          1233,
-          "article.t0",
-          "w",
-          "n",
-          "Headline",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-
+      "prefer 'object_type' of Body Text to other types" in {
+        val articleObjectOne = createTestArticle("w", "Tabular Text", 1)
+        val articleObjectTwo = createTestArticle("w", "Body Text [Ruled]", 1)
+        val articleObjectThree = createTestArticle("w", "Panel Text", 1)
+        val articleObjectFour = createTestArticle("w", "Headline", 1)
         val articles = Array(articleObjectFour, articleObjectTwo, articleObjectThree, articleObjectOne)
 
-        val bundle = OctopusBundle(101, "", "", Some(""), "", articles)
-
-        assert(ArticleFinder.findBodyText(bundle).contains(articleObjectTwo.copy(object_type = "Body Text")))
+        assert(
+          ArticleFinder
+            .findBodyText(createTestBundle(articles))
+            .contains(articleObjectTwo.copy(object_type = "Body Text")))
       }
-      "prefer Panel Text to Tabular types" in {
-        val tabularArticleForWeb = OctopusArticle(
-          1233,
-          "article.t0",
-          "w",
-          "n",
-          "Tabular Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-        val panelArticle = OctopusArticle(
-          1234,
-          "article.t0",
-          "w",
-          "n",
-          "Panel Text",
-          2,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-        val tabularArticleForPrint = OctopusArticle(
-          1234,
-          "article.t0",
-          "p",
-          "n",
-          "Tabular Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-
+      "prefer 'object_type' of Panel Text to Tabular types" in {
+        val tabularArticleForWeb = createTestArticle("w", "Tabular Text", 1)
+        val panelArticle = createTestArticle("w", "Panel Text", 1)
+        val tabularArticleForPrint = createTestArticle("p", "Tabular Text", 1)
         val articles = Array(tabularArticleForPrint, panelArticle, tabularArticleForWeb)
 
-        val bundle = OctopusBundle(101, "", "", Some(""), "", articles)
-
-        assert(ArticleFinder.findBodyText(bundle).contains(panelArticle))
+        assert(ArticleFinder.findBodyText(createTestBundle(articles)).contains(panelArticle))
       }
-      "prefer Tabular if there is no other option" in {
-        val articleForPrint = OctopusArticle(
-          1233,
-          "article.t0",
-          "p",
-          "n",
-          "Tabular Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-        val articleForWeb = OctopusArticle(
-          1234,
-          "article.t0",
-          "w",
-          "n",
-          "Tabular Text",
-          2,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-
+      "prefer 'object_type' of Tabular if there is no other option" in {
+        val articleForPrint = createTestArticle("p", "Tabular Text", 1)
+        val articleForWeb = createTestArticle("w", "Tabular Text", 1)
         val articles = Array(articleForPrint, articleForWeb)
 
-        val bundle = OctopusBundle(101, "", "", Some(""), "", articles)
-
-        assert(ArticleFinder.findBodyText(bundle).contains(articleForWeb))
+        assert(ArticleFinder.findBodyText(createTestBundle(articles)).contains(articleForWeb))
       }
       "select the only option if only one available" in {
-        val articleForPrint = OctopusArticle(
-          1233,
-          "article.t0",
-          "p",
-          "n",
-          "Tabular Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-
+        val articleForPrint = createTestArticle("p", "Tabular Text", 1)
         val articles = Array(articleForPrint)
 
-        val bundle = OctopusBundle(101, "", "", Some(""), "", articles)
-
-        assert(ArticleFinder.findBodyText(bundle).contains(articleForPrint))
+        assert(ArticleFinder.findBodyText(createTestBundle(articles)).contains(articleForPrint))
       }
       "select the option with the lowest object number" in {
-        val articleForPrint = OctopusArticle(
-          1233,
-          "article.t0",
-          "p",
-          "n",
-          "Tabular Text",
-          1,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-
-        val articleForPrintSecond = OctopusArticle(
-          1233,
-          "article.t0",
-          "p",
-          "n",
-          "Tabular Text",
-          2,
-          "202006241200",
-          None,
-          "N",
-          "Writers",
-          Some(1000),
-          Some("1"))
-
+        val articleForPrint = createTestArticle("p", "Tabular Text", 1)
+        val articleForPrintSecond = createTestArticle("p", "Tabular Text", 2)
         val articles = Array(articleForPrintSecond, articleForPrint)
 
-        val bundle = OctopusBundle(101, "", "", Some(""), "", articles)
-
-        assert(ArticleFinder.findBodyText(bundle).contains(articleForPrint))
+        assert(ArticleFinder.findBodyText(createTestBundle(articles)).contains(articleForPrint))
       }
     }
   }
