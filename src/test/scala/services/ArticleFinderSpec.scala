@@ -40,6 +40,10 @@ class ArticleFinderSpec extends AnyWordSpec with Matchers {
         val exampleJson = TestUtils.readJson(s"/exampleWithMissingArticleFields.json").as[OctopusBundle]
         assert(ArticleFinder.findBodyText(exampleJson).isEmpty)
       }
+      "return None when there is nothing for suitable publication" in {
+        val exampleJson = TestUtils.readJson(s"/exampleProblem.json").as[OctopusBundle]
+        assert(ArticleFinder.findBodyText(exampleJson).isEmpty)
+      }
       "retrieve the primary body text when there is more than one possible body text" in {
         val articleWithMultipleBodyTexts =
           TestUtils.readJson(s"/exampleWithMultipleBodyTexts.json").as[OctopusBundle]

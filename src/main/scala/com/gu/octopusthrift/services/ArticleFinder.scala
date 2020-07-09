@@ -66,7 +66,10 @@ object ArticleFinder extends Logging {
     val onlyBodyTextArticles: Array[OctopusArticle] =
       bundle.articles
         .map(a => a.copy(object_type = cleanObjectType(a.object_type)))
-        .filter(a => bodyTextObjects.contains(a.object_type))
+        .filter(a =>
+          bodyTextObjects.contains(a.object_type) && validPublicationDestinations
+            .contains(a.for_publication.toLowerCase())
+        )
 
     if (onlyBodyTextArticles.isEmpty)
       // There are no suitable articles
@@ -77,9 +80,7 @@ object ArticleFinder extends Logging {
     else {
       // Given a number of suitable articles, group them by their publication destination
       val groupedByDestination: Map[String, Array[OctopusArticle]] =
-        onlyBodyTextArticles
-          .groupBy(_.for_publication.toLowerCase)
-          .filter(groupedArticles => validPublicationDestinations.contains(groupedArticles._1.toLowerCase))
+        onlyBodyTextArticles.groupBy(_.for_publication.toLowerCase)
 
       // Pick the available articles for the destination we prefer the most, then group them by object type
       val forPreferredDestinationAndGroupedByType: Map[String, Array[OctopusArticle]] =
