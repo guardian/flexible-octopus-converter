@@ -19,7 +19,9 @@ object ArticleTestHelpers {
       "N",
       "Writers",
       Some(1000),
-      onPages)
+      onPages,
+      "Test User"
+    )
 }
 
 class OctopusArticleSpec extends AnyWordSpec {
@@ -38,7 +40,9 @@ class OctopusArticleSpec extends AnyWordSpec {
           "N",
           "Writers",
           Some(1000),
-          Some("1"))
+          Some("1"),
+          "Test User"
+        )
 
         val thriftArticle = octopusArticle.as[Article]
 
@@ -47,6 +51,7 @@ class OctopusArticleSpec extends AnyWordSpec {
         assert(thriftArticle.lastModified == 1593000000)
         assert(thriftArticle.lawyered == Lawyered.Notapplicable)
         assert(thriftArticle.status == ArticleStatus.Writers)
+        assert(thriftArticle.lastModifiedBy == "Test User")
       }
     }
   }

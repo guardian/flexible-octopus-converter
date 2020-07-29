@@ -10,34 +10,37 @@ import play.api.libs.json._
 import scala.util.{ Success, Try }
 
 /**
- * This model does not represent all fields sent by Octopus,
- * only those that will be relevant in converting to our Thrift model
- */
+  * This model does not represent all fields sent by Octopus,
+  * only those that will be relevant in converting to our Thrift model
+  */
 case class OctopusArticle(
-  id: Int,
-  filename: String,
-  for_publication: String,
-  lawyered: String,
-  object_type: String,
-  object_number: Int,
-  last_modified: String,
-  in_use_by: Option[String],
-  ischeckedout: String,
-  status: String,
-  attached_to: Option[Int],
-  on_pages: Option[String]) extends Ordered[OctopusArticle] {
+    id: Int,
+    filename: String,
+    for_publication: String,
+    lawyered: String,
+    object_type: String,
+    object_number: Int,
+    last_modified: String,
+    in_use_by: Option[String],
+    ischeckedout: String,
+    status: String,
+    attached_to: Option[Int],
+    on_pages: Option[String],
+    last_user: String
+) extends Ordered[OctopusArticle] {
 
   def lastModifiedEpoch: Long =
     TimeUnit.MILLISECONDS.toSeconds(
       DateTime
         .parse(last_modified, DateTimeFormat.forPattern("yyyyMMddHHmm").withZoneUTC())
         .withZone(DateTimeZone.UTC)
-        .getMillis)
+        .getMillis
+    )
 
   def pageNumber: Option[Long] = {
     Try(on_pages.map(_.split(',')(0).split(';')(0).toLong)) match {
       case Success(number) => number
-      case _ => None
+      case _               => None
     }
   }
 
@@ -58,7 +61,8 @@ object OctopusArticle {
       "n" -> Lawyered.Notapplicable,
       "p" -> Lawyered.Pending,
       "c" -> Lawyered.Cleared,
-      "r" -> Lawyered.Priority)
+      "r" -> Lawyered.Priority
+    )
 
     val articleStatus = Map(
       "chief sub" -> ArticleStatus.Chiefsub,
@@ -68,7 +72,8 @@ object OctopusArticle {
       "killed" -> ArticleStatus.Killed,
       "revise sub" -> ArticleStatus.Revisesub,
       "subs" -> ArticleStatus.Subs,
-      "writers" -> ArticleStatus.Writers)
+      "writers" -> ArticleStatus.Writers
+    )
 
     val isCheckedOut = Map("y" -> true, "n" -> false)
 
@@ -80,6 +85,8 @@ object OctopusArticle {
       octopusArticle.lastModifiedEpoch,
       lawyered(octopusArticle.lawyered.toLowerCase),
       articleStatus(octopusArticle.status.toLowerCase),
-      octopusArticle.filename)
+      octopusArticle.filename,
+      octopusArticle.last_user
+    )
   }
 }
