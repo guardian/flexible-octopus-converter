@@ -4,7 +4,7 @@ This repo contains the lambda function which converts incoming Octopus JSON into
 
 ## Deployment
 
-The lambda is deployed via RiffRaff, using the [Editorial Tools::Octopus Conversion Lambda](https://riffraff.gutools.co.uk/deployment/history?projectName=Editorial%20Tools%3A%3AOctopus%20Conversion%20Lambda&page=1) project. On merge to master, the lambda will be automatically deployed.
+The lambda is deployed via RiffRaff, using the [Editorial Tools::Octopus Conversion Lambda](https://riffraff.gutools.co.uk/deployment/history?projectName=Editorial%20Tools%3A%3AOctopus%20Conversion%20Lambda&page=1) project. On merge to main, the lambda will be automatically deployed.
 
 ## Logs
 
@@ -12,6 +12,6 @@ Logs are sent to Cloudwatch and the lambda's performance can be monitored in [Gr
 
 ## Links
 
-The cloud formation for these resources can be found in the [editorial-tools-platform](https://github.com/guardian/editorial-tools-platform/blob/master/cloudformation/composer-account/octopus-integration.yaml) repo.
+The cloud formation for these resources can be found in the [editorial-tools-platform](https://github.com/guardian/editorial-tools-platform/) repo.
 
 The thrift model can be found in the [flexible-octopus-model](https://github.com/guardian/flexible-octopus-model) repo.
