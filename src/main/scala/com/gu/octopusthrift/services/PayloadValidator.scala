@@ -31,7 +31,6 @@ object PayloadValidator extends Logging {
 
   def isValidBundle(bundle: OctopusBundle): Boolean = {
     logger.info(s"Validating bundle for ${bundle.composerId}: $bundle")
-    bundle.articles.foreach(article => logger.info(s"Article: $article"))
     logger.info(s"Body text for ${bundle.composerId}: ${ArticleFinder.findBodyText(bundle)}")
     val hasComposerId = bundle.composerId.isDefined
     val hasBodyText = ArticleFinder.findBodyText(bundle).isDefined
