@@ -15,8 +15,6 @@ scalacOptions ++= Seq(
   "-target:jvm-1.8",
   "-Ywarn-dead-code"
 )
-resolvers += Resolver.bintrayRepo("guardian", "editorial-tools")
-
 val awsSdkVersion = "1.11.804"
 
 libraryDependencies ++= Seq(
@@ -31,7 +29,7 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.1.2" % "test",
   "com.typesafe.play" %% "play-json" % "2.8.1",
   "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor" % "2.11.0",
-  "com.gu" %% "flexible-octopus-model" % "0.4.0",
+  "com.gu" %% "flexible-octopus-model" % "0.5.0",
   "org.apache.thrift" % "libthrift" % "0.13.0",
   "com.twitter" %% "scrooge-core" % "20.5.0"
 )
