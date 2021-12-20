@@ -6,7 +6,7 @@ description := "AWS Lambda providing conversion between Octopus JSON and Thrift"
 
 version := "1.0"
 
-scalaVersion := "2.13.1"
+scalaVersion := "2.13.7"
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -19,7 +19,7 @@ val awsSdkVersion = "1.11.804"
 
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.1",
-  "com.amazonaws" % "aws-lambda-java-log4j2" % "1.4.0",
+  "com.amazonaws" % "aws-lambda-java-log4j2" % "1.5.0",
   "com.amazonaws" % "aws-java-sdk-kinesis" % awsSdkVersion,
   "com.amazonaws" % "aws-java-sdk-sqs" % awsSdkVersion,
   "com.amazonaws" % "aws-java-sdk-cloudwatch" % awsSdkVersion,
