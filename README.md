@@ -21,7 +21,7 @@ The thrift model can be found in the [flexible-octopus-model](https://github.com
 The project includes some basic tests for the functionality of the lambda. It is also possible to test a production environment by putting data onto the kinesis stream in base64. You can use the test resources as a starting point:
 
 Base64 encoding a file:
-`EXAMPLE=$(cat ./src/test/resources/example.json | base64)`
+`EXAMPLE=$(cat ./src/test/resources/exampleBundleObject.json | base64)`
 
 Putting a record onto the stream:
 `aws kinesis put-record --stream-name <STREAM_NAME> --data $EXAMPLE --profile <PROFILE> --partition-key example --region <REGION>`
