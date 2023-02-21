@@ -5,7 +5,6 @@ deployments:
   octopus-converter:
     type: aws-lambda
     parameters:
-      bucket: composer-dist
       functionNames: [octopus-conversion-]
       fileName: octopus-converter.jar
       prefixStack: false
