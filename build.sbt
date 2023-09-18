@@ -34,13 +34,13 @@ libraryDependencies ++= Seq(
   "com.twitter" %% "scrooge-core" % "20.5.0"
 )
 
-enablePlugins(RiffRaffArtifact)
+// enablePlugins(RiffRaffArtifact)
 
-assemblyJarName := s"${name.value}.jar"
-riffRaffPackageType := assembly.value
-riffRaffUploadArtifactBucket := Option("riffraff-artifact")
-riffRaffUploadManifestBucket := Option("riffraff-builds")
-riffRaffManifestProjectName := "Editorial Tools::Octopus Conversion Lambda"
+// assemblyJarName := s"${name.value}.jar"
+// riffRaffPackageType := assembly.value
+// riffRaffUploadArtifactBucket := Option("riffraff-artifact")
+// riffRaffUploadManifestBucket := Option("riffraff-builds")
+// riffRaffManifestProjectName := "Editorial Tools::Octopus Conversion Lambda"
 
 assembly / assemblyMergeStrategy := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
