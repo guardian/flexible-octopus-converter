@@ -10,8 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    permissions: # required by aws-actions/configure-aws-credentials
+    permissions: 
+      # required by guardian/actions-riff-raff
       id-token: write
+      pull-requests: write
       contents: read
 
     steps:
@@ -28,26 +30,26 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          distribution: "adopt"
-          java-version: "8"
-          cache: "sbt"
+          distribution: corretto
+          java-version: 11
+          cache: sbt
 
-      - name: AWS Auth
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.GU_RIFF_RAFF_ROLE_ARN }}
-          aws-region: eu-west-1
+      - name: Install sbt
+        uses: sbt/setup-sbt@8a071aa780c993c7a204c785d04d3e8eb64ef272 # v1.1.0
 
       - name: Build and Test project
         run: |
           sbt clean compile test assembly
           cp target/scala*/octopus-converter.jar ./octopus-converter.jar
 
-      - uses: guardian/actions-riff-raff@v2
+      - uses: guardian/actions-riff-raff@v4
         with:
+          roleArn: ${{ secrets.GU_RIFF_RAFF_ROLE_ARN }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
           projectName: Editorial Tools::Octopus Conversion Lambda
           buildNumber: ${{ env.BUILD_NUMBER }}
           configPath: riff-raff.yaml
           contentDirectories: |
             octopus-converter:
               - octopus-converter.jar
+              
