@@ -44,8 +44,8 @@ jobs:
 
       - uses: guardian/actions-riff-raff@v4
         with:
-          roleArn: ${{ secrets.GU_RIFF_RAFF_ROLE_ARN }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
+          roleArn: ${{ secrets.GU_RIFF_RAFF_ROLE_ARN }}
           projectName: Editorial Tools::Octopus Conversion Lambda
           buildNumber: ${{ env.BUILD_NUMBER }}
           configPath: riff-raff.yaml
