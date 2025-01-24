@@ -6,7 +6,7 @@ description := "AWS Lambda providing conversion between Octopus JSON and Thrift"
 
 version := "1.0"
 
-scalaVersion := "2.13.7"
+scalaVersion := "2.13.16"
 
 scalacOptions ++= Seq(
   "-deprecation",
