@@ -1,6 +1,6 @@
 package com.gu.octopusthrift
 
-import com.amazonaws.services.kinesis.model.Record
+import com.amazonaws.services.lambda.runtime.events.KinesisEvent.Record
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.gu.flexibleoctopus.model.thrift._
