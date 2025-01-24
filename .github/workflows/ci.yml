@@ -35,7 +35,7 @@ jobs:
           cache: sbt
 
       - name: Install sbt
-        uses: sbt/setup-sbt@8a071aa780c993c7a204c785d04d3e8eb64ef272 # v1.1.0
+        uses: sbt/setup-sbt@v1 
 
       - name: Build and Test project
         run: |
