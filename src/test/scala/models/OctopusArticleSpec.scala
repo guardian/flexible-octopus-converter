@@ -20,8 +20,7 @@ object ArticleTestHelpers {
       "Writers",
       Some(1000),
       onPages,
-      "Test User"
-    )
+      "Test User")
 }
 
 class OctopusArticleSpec extends AnyWordSpec {
@@ -41,8 +40,7 @@ class OctopusArticleSpec extends AnyWordSpec {
           "Writers",
           Some(1000),
           Some("1"),
-          "Test User"
-        )
+          "Test User")
 
         val thriftArticle = octopusArticle.as[Article]
 

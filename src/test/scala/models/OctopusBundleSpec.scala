@@ -31,8 +31,7 @@ class OctopusBundleSpec extends AnyWordSpec with Matchers {
             "Writers",
             Some(1000),
             Some("1"),
-            "Test User"
-          )
+            "Test User")
 
         def createBundle(article: OctopusArticle) =
           OctopusBundle(2345, ",,,,,,,1", "", Some("20200624"), "", Array(article))
@@ -71,8 +70,7 @@ class OctopusBundleSpec extends AnyWordSpec with Matchers {
           "Writers",
           Some(1000),
           Some("1"),
-          "Test User"
-        )
+          "Test User")
 
         val octopusBundle = OctopusBundle(2345, "", "", Some("20200624"), "", Array(octopusArticle))
 
@@ -143,16 +141,14 @@ class OctopusBundleSpec extends AnyWordSpec with Matchers {
           "Desk",
           Some(0),
           Some(""), // on pages
-          "Test User"
-        )
+          "Test User")
         val bundle = OctopusBundle(
           15313010,
           "Mesple,483,,8,0,20200629125607,,5ef9bfff8f08aff12bef6572,20200629125602,0,Music,1",
           "gdn",
           Some(""), // pub date
           "1jo",
-          Array(article)
-        )
+          Array(article))
 
         val storyBundle = bundle.as[StoryBundle]
 

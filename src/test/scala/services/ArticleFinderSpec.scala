@@ -22,8 +22,7 @@ class ArticleFinderSpec extends AnyWordSpec with Matchers {
       "Writers",
       Some(1000),
       Some("1"),
-      "Test User"
-    )
+      "Test User")
 
   def createTestBundle(articles: Array[OctopusArticle]) = OctopusBundle(101, "", "", Some(""), "", articles)
 
@@ -88,8 +87,7 @@ class ArticleFinderSpec extends AnyWordSpec with Matchers {
         assert(
           ArticleFinder
             .findBodyText(createTestBundle(articles))
-            .contains(articleObjectTwo.copy(object_type = "Body Text"))
-        )
+            .contains(articleObjectTwo.copy(object_type = "Body Text")))
       }
       "prefer 'object_type' of Panel Text to Tabular types" in {
         val tabularArticleForWeb = createTestArticle("w", "Tabular Text", 1)
