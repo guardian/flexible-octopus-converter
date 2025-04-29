@@ -39,8 +39,7 @@ jobs:
 
       - name: Build and Test project
         run: |
-          sbt clean compile test assembly
-          cp target/scala*/octopus-converter.jar ./octopus-converter.jar
+          sbt clean compile test Universal/packageBin
 
       - uses: guardian/actions-riff-raff@v4
         with:
@@ -51,5 +50,4 @@ jobs:
           configPath: riff-raff.yaml
           contentDirectories: |
             octopus-converter:
-              - octopus-converter.jar
-              
+              - target/universal/octopus-converter.zip

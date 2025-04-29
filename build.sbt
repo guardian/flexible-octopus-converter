@@ -34,10 +34,7 @@ libraryDependencies ++= Seq(
   "com.twitter" %% "scrooge-core" % "20.5.0"
 )
 
-assemblyJarName := s"${name.value}.jar"
+enablePlugins(JavaAppPackaging)
 
-
-assembly / assemblyMergeStrategy := {
-  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
-  case _                             => MergeStrategy.first
-}
+Universal / topLevelDirectory := None
+Universal / packageName := normalizedName.value
