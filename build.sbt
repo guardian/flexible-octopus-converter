@@ -15,7 +15,7 @@ scalacOptions ++= Seq(
   "-target:jvm-1.8",
   "-Ywarn-dead-code"
 )
-val awsSdkVersion = "1.11.804"
+val awsSdkVersion = "1.11.1034"
 
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.3",
@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk-kinesis" % awsSdkVersion,
   "com.amazonaws" % "aws-java-sdk-sqs" % awsSdkVersion,
   "com.amazonaws" % "aws-java-sdk-cloudwatch" % awsSdkVersion,
-  "com.amazonaws" % "aws-lambda-java-events" % "3.14.0",
+  "com.amazonaws" % "aws-lambda-java-events" % "3.15.0",
   "org.slf4j" % "slf4j-simple" % "2.0.16",
   "org.scalactic" %% "scalactic" % "3.2.19",
   "org.scalatest" %% "scalatest" % "3.2.19" % "test",
