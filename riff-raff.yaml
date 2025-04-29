@@ -6,5 +6,5 @@ deployments:
     type: aws-lambda
     parameters:
       functionNames: [octopus-conversion-]
-      fileName: octopus-converter.jar
+      fileName: octopus-converter.zip
       prefixStack: false
