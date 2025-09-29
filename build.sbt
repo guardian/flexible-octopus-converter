@@ -18,7 +18,7 @@ scalacOptions ++= Seq(
 val awsSdkVersion = "1.12.791"
 
 libraryDependencies ++= Seq(
-  "com.amazonaws" % "aws-lambda-java-core" % "1.2.3",
+  "com.amazonaws" % "aws-lambda-java-core" % "1.4.0",
   "com.amazonaws" % "aws-lambda-java-log4j2" % "1.6.0",
   "com.amazonaws" % "aws-java-sdk-kinesis" % awsSdkVersion,
   "com.amazonaws" % "aws-java-sdk-sqs" % awsSdkVersion,
