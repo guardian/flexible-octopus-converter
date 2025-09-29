@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk-kinesis" % awsSdkVersion,
   "com.amazonaws" % "aws-java-sdk-sqs" % awsSdkVersion,
   "com.amazonaws" % "aws-java-sdk-cloudwatch" % awsSdkVersion,
-  "com.amazonaws" % "aws-lambda-java-events" % "3.14.0",
+  "com.amazonaws" % "aws-lambda-java-events" % "3.16.1",
   "org.slf4j" % "slf4j-simple" % "2.0.16",
   "org.scalactic" %% "scalactic" % "3.2.19",
   "org.scalatest" %% "scalatest" % "3.2.19" % "test",
