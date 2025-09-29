@@ -30,7 +30,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.10.7",
   "com.gu" %% "flexible-octopus-model" % "0.5.0",
   "org.apache.thrift" % "libthrift" % "0.14.0",
-  "com.twitter" %% "scrooge-core" % "20.5.0"
+  "com.twitter" %% "scrooge-core" % "20.12.0"
 )
 
 enablePlugins(JavaAppPackaging)
