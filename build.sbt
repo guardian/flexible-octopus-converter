@@ -28,7 +28,7 @@ libraryDependencies ++= Seq(
   "org.scalactic" %% "scalactic" % "3.2.19",
   "org.scalatest" %% "scalatest" % "3.2.19" % "test",
   "com.typesafe.play" %% "play-json" % "2.10.7",
-  "com.gu" %% "flexible-octopus-model" % "0.5.0",
+  "com.gu" %% "flexible-octopus-model" % "0.5.1",
   "org.apache.thrift" % "libthrift" % "0.14.0",
   "com.twitter" %% "scrooge-core" % "20.5.0"
 )
