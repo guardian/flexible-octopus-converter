@@ -33,6 +33,10 @@ libraryDependencies ++= Seq(
   "com.twitter" %% "scrooge-core" % "20.5.0"
 )
 
+dependencyOverrides ++= Seq(
+  "org.apache.tomcat.embed" % "tomcat-embed-core" % "9.0.108"
+)
+
 enablePlugins(JavaAppPackaging)
 
 Universal / topLevelDirectory := None
