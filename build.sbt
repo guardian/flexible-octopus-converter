@@ -34,7 +34,7 @@ libraryDependencies ++= Seq(
 )
 
 dependencyOverrides ++= Seq(
-  "org.apache.tomcat.embed" % "tomcat-embed-core" % "9.0.122"
+  "org.apache.tomcat.embed" % "tomcat-embed-core" % "11.0.26"
 )
 
 enablePlugins(JavaAppPackaging)
