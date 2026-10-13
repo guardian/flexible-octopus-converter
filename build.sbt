@@ -6,7 +6,7 @@ description := "AWS Lambda providing conversion between Octopus JSON and Thrift"
 
 version := "1.0"
 
-scalaVersion := "2.13.16"
+scalaVersion := "2.13.18"
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -24,10 +24,10 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk-sqs" % awsSdkVersion,
   "com.amazonaws" % "aws-java-sdk-cloudwatch" % awsSdkVersion,
   "com.amazonaws" % "aws-lambda-java-events" % "3.14.0",
-  "org.slf4j" % "slf4j-simple" % "2.0.16",
-  "org.scalactic" %% "scalactic" % "3.2.19",
-  "org.scalatest" %% "scalatest" % "3.2.19" % "test",
-  "com.typesafe.play" %% "play-json" % "2.10.7",
+  "org.slf4j" % "slf4j-simple" % "2.0.20",
+  "org.scalactic" %% "scalactic" % "3.2.20",
+  "org.scalatest" %% "scalatest" % "3.2.20" % "test",
+  "com.typesafe.play" %% "play-json" % "2.10.8",
   "com.gu" %% "flexible-octopus-model" % "0.5.0",
   "org.apache.thrift" % "libthrift" % "0.14.0",
   "com.twitter" %% "scrooge-core" % "20.5.0"
