@@ -24,7 +24,7 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk-sqs" % awsSdkVersion,
   "com.amazonaws" % "aws-java-sdk-cloudwatch" % awsSdkVersion,
   "com.amazonaws" % "aws-lambda-java-events" % "3.14.0",
-  "org.slf4j" % "slf4j-simple" % "2.0.16",
+  "org.slf4j" % "slf4j-simple" % "2.0.20",
   "org.scalactic" %% "scalactic" % "3.2.20",
   "org.scalatest" %% "scalatest" % "3.2.20" % "test",
   "com.typesafe.play" %% "play-json" % "2.10.8",
