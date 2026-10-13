@@ -25,7 +25,7 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk-cloudwatch" % awsSdkVersion,
   "com.amazonaws" % "aws-lambda-java-events" % "3.14.0",
   "org.slf4j" % "slf4j-simple" % "2.0.16",
-  "org.scalactic" %% "scalactic" % "3.2.19",
+  "org.scalactic" %% "scalactic" % "3.2.20",
   "org.scalatest" %% "scalatest" % "3.2.19" % "test",
   "com.typesafe.play" %% "play-json" % "2.10.8",
   "com.gu" %% "flexible-octopus-model" % "0.5.0",
