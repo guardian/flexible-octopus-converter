@@ -16,6 +16,7 @@ scalacOptions ++= Seq(
   "-Ywarn-dead-code"
 )
 val awsSdkVersion = "1.12.791"
+val jacksonVersion = "2.18.11"
 
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.3",
@@ -34,6 +35,12 @@ libraryDependencies ++= Seq(
 )
 
 dependencyOverrides ++= Seq(
+  "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
+  "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
+  "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % jacksonVersion,
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % jacksonVersion,
+  "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor" % jacksonVersion,
   "org.apache.tomcat.embed" % "tomcat-embed-core" % "9.0.122"
 )
 
