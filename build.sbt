@@ -16,7 +16,7 @@ scalacOptions ++= Seq(
   "-Ywarn-dead-code"
 )
 val awsSdkVersion = "1.12.791"
-val jacksonVersion = "2.18.11"
+val jacksonVersion = "2.18.12"
 
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.3",
