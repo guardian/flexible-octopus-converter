@@ -35,6 +35,8 @@ libraryDependencies ++= Seq(
 )
 
 dependencyOverrides ++= Seq(
+  "org.apache.logging.log4j" % "log4j-api" % "2.25.5",
+  "org.apache.logging.log4j" % "log4j-core" % "2.25.5",
   "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
