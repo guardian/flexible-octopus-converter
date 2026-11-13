@@ -30,11 +30,16 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.2.19" % "test",
   "com.typesafe.play" %% "play-json" % "2.10.7",
   "com.gu" %% "flexible-octopus-model" % "0.5.0",
-  "org.apache.thrift" % "libthrift" % "0.14.0",
+  "org.apache.thrift" % "libthrift" % "0.24.0",
   "com.twitter" %% "scrooge-core" % "20.5.0"
 )
 
 dependencyOverrides ++= Seq(
+  "org.apache.httpcomponents.client5" % "httpclient5" % "5.6.3",
+  "org.apache.httpcomponents.core5" % "httpcore5" % "5.4.3",
+  "org.apache.httpcomponents.core5" % "httpcore5-h2" % "5.4.3",
+  "org.apache.logging.log4j" % "log4j-api" % "2.25.5",
+  "org.apache.logging.log4j" % "log4j-core" % "2.25.5",
   "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
